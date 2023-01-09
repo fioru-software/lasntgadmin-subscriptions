@@ -24,7 +24,7 @@ pipeline {
     }
 
     environment {
-        PROJECT_NAME = "lasntgadmin-plugin_template"
+        PROJECT_NAME = "lasntgadmin-subscriptions"
         REPO_NAME = "fioru-software/$PROJECT_NAME"
         GITHUB_API_URL = "https://api.github.com/repos/$REPO_NAME"
         GITHUB_TOKEN = credentials('jenkins-github-personal-access-token')
@@ -36,7 +36,7 @@ pipeline {
         SITE_TITLE = 'WordPress'
         WP_PLUGINS = 'woocommerce'
         WP_THEME = 'storefront'
-        WP_PLUGIN = "example-plugin"
+        WP_PLUGIN = "lasntgadmin-subscriptions"
         ADMIN_USERNAME = 'admin'
         ADMIN_PASSWORD = 'secret'
         ADMIN_EMAIL = 'wordpress@example.com'
