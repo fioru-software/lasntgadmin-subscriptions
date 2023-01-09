@@ -1,24 +1,31 @@
-# LASNTG WordPress plugin template
+# LASNTG Subscription plugin
 
 Please see [WordPress plugin developer handbook](https://developer.wordpress.org/plugins/) for detailed info. 
 
 ## Development
 
-### WooCommerce REST API
+## Configuring [WP SMTP Mailing Queue plugin](https://wordpress.org/plugins/smtp-mailing-queue/) 
 
-- [Getting started with the REST API](https://github.com/woocommerce/woocommerce/wiki/Getting-started-with-the-REST-API)
-- [Woo REST API](https://woocommerce.github.io/woocommerce-rest-api-docs)
+> Admin > Settings SMTP Mailing Queue > SMTP Settings
+
+Configure the [WP SMTP Mailing Queue plugin](https://wordpress.org/plugins/smtp-mailing-queue/) with [Mailtrap Inbox](https://mailtrap.io/) SMTP Credentials. 
+
+My suggestion would be to create your own [Mailtrap Inbox](https://mailtrap.io/) account, but a shared account is aslo available on our [Bitwarden](https://bitwarden.veri.ie).
+
+> Admin > Settings > SMTP Mailing Queue > Advanced 
+
+Don't use wp_cron = true;
+
+### Running Cron
 
 ```sh
-# NB: requires https://
-CONSUMER_KEY=
-CONSUMER_SECRET=
-curl -k -u '$CONSUMER_KEY:$CONSUMER_SECRET' https://localhost:8443/wp-json/wc/v2/orders/ | jq
+# list all cron events
+wp cron event list
+# manually trigger cron (smtp-mailing-queue required $_GET param
+wp cron event run --due-now --exec='$_GET["smqProcessQueue"]=1;'
 ```
 
 ### PHP
-
-Emails will be sent to [Mailtrap Inbox](https://mailtrap.io/). Credentials are available on our [Bitwarden](https://bitwarden.veri.ie).
 
 Create `.env` file. 
 
@@ -27,8 +34,8 @@ Add your plugin folder name to the `WP_PLUGIN=` environment variable.
 ```
 SITE_URL=localhost:8080
 SITE_TITLE=WordPress
-WP_PLUGIN=example-plugin
-WP_PLUGINS=groups woocommerce advanced-custom-fields user-role-editor wp-mail-smtp
+WP_PLUGIN=lasntgadmin-subscriptions
+WP_PLUGINS=groups woocommerce advanced-custom-fields user-role-editor smtp-mailing-queue
 WP_THEME=storefront
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=secret
@@ -39,7 +46,7 @@ Build images and run WordPress.
 
 ```sh
 # build Docker image
-docker-compose build # optionally override Dockerfile build arguments by appending --build-arg USER_ID=$(id -u)
+docker-compose build --build-arg GITHUB_TOKEN= # optionally override Dockerfile build arguments by appending --build-arg USER_ID=$(id -u)
 # start container
 docker-compose up wordpress 
 ```
@@ -47,7 +54,7 @@ docker-compose up wordpress
 Run the tests
 
 ```sh
-docker exec -ti -u www-data lasntg-plugin_template_wordpress_1 bash
+docker exec -ti -u www-data lasntg-subscriptions_wordpress_1 bash
 cd /usr/local/src
 composer install
 composer all
@@ -96,4 +103,4 @@ git push -u origin 0.1.4
 - [Evalon WooCommerce Payment Gateway](https://developer.elavon.com/na/docs/converge/1.0.0/integration-guide/shopping_carts/woocommerce_installation_guide)
 - [Advanced Custom Fields](https://www.advancedcustomfields.com/resources)
 - [WooCommerce Storefront Theme](https://woocommerce.com/documentation/themes/storefront/)
-- [WP Mail SMTP](https://wpmailsmtp.com/docs/)
+- [WP SMTP Mail Queue](https://wordpress.org/plugins/smtp-mailing-queue/)
