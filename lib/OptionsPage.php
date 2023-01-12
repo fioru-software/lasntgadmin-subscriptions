@@ -4,10 +4,11 @@ namespace Lasntg\Admin\Subscriptions;
 
 class OptionsPage
 {
-    private static $options;
-    private static $optionName = 'lasntg_subscriptions_options';
-    private static $optionsSanitized = false;
+    use Editors;
 
+    protected static $options;
+    protected static $optionName = 'lasntg_subscriptions_options';
+    private static $optionsSanitized = false;
 
     /**
      * Slug of currently active tab
@@ -25,7 +26,7 @@ class OptionsPage
     public static function init()
     {
         self::$activeTab = isset($_GET['tab']) ? $_GET['tab'] : 'settings';
-        self::$options = get_option(self::$optionName);
+
         if (is_admin() && self::$activeTab == self::$tabName) {
             add_action('admin_menu', [self::class, 'add_plugin_page']);
         }
@@ -62,6 +63,13 @@ class OptionsPage
             '',                                             // title
             [self::class, 'section_info'],                        // callback
             self::$optionName                    // page
+        );
+        add_settings_field(
+            'course_update',                                    // id
+            __('Course update To National Manager', 'lasntgadmin'),          // title
+            [self::class, 'course_update'],                  // callback
+            self::$optionName,                   // page
+            'message_settings'                              // section
         );
         add_settings_field(
             'status_change',                                    // id
@@ -105,13 +113,13 @@ class OptionsPage
         );
 
         add_settings_field(
-            'order_cancelled',                                    // id
+            'order_cancellation',                                    // id
             __('Order Cancelled', 'lasntgadmin'),          // title
             [self::class, 'order_cancellation'],                  // callback
             self::$optionName,                   // page
             'message_settings'                              // section
         );
-        
+
         add_settings_field(
             'status_set_to_enrolling',                                    // id
             __('Vacant space available', 'lasntgadmin'),          // title
@@ -121,58 +129,6 @@ class OptionsPage
         );
     }
 
-    public static function status_change()
-    {
-        self::wp_editor('status_change');
-    }
-    private static function wp_editor($name)
-    {
-        $input_name = self::$optionName . "[$name]";
-        $settings = array(
-            'textarea_name' => $input_name,
-            'media_buttons' => false,
-            'textarea_rows' => 5,
-        );
-        echo wp_editor(
-            self::get_options($name),
-            $name,
-            $settings
-        );
-    }
-    public static function course_cancellation()
-    {
-        self::wp_editor('course_cancellation');
-    }
-
-    public static function status_set_to_enrolling()
-    {
-        self::wp_editor('course_cancellation');
-    }
-    
-    public static function order_cancellation()
-    {
-        self::wp_editor('course_cancellation');
-    }
-
-    public static function course_creation()
-    {
-        self::wp_editor('course_creation');
-    }
-
-    public static function cancel_waiting_order()
-    {
-        self::wp_editor('cancel_waiting_order');
-    }
-    
-    public static function training_centre_confirms_order()
-    {
-        self::wp_editor('training_centre_confirms_order');
-    }
-
-    private static function get_options($name)
-    {
-        return self::$options && isset(self::$options[$name]) ? self::$options[$name] : '';
-    }
 
     /**
      * Prints tab section info
@@ -186,64 +142,62 @@ class OptionsPage
 
         <div class="" style="display: flex">
             <div>
-                <p>Course Details</p>
+                <p><strong>Course Details</strong></p>
 
-                    <p>
-                        Course Code: {%code%}<br />
-                        Course Name: {%name%}<br />
-                        Course Cost: {%cost%}<br />
-                        Course Capacity: {%capacity%}<br />
-                        Course Status: {%status%}<br />
-                        Course Order: {%orDer%}<br />
-                        Course Awarding Body: {%awarding_body%}<br />
-                        Course Start Date: {%start_date%}<br />
-                        Course Start Time: {%start_time%}<br />
-                        Course End Date: {%end_date%}<br />
-                        Course End Time: {%end_time%}<br />
-                        Course Duration: {%duration%}<br />
-                        Course Location: {%location%}<br />
-                        Course Trainer Name: {%trainer_name%}<br />
-                        Course Trainer Email: {%trainer_email%}<br />
-                    </p>
+                <p>
+                    Course Code: {%code%}<br />
+                    Course Name: {%name%}<br />
+                    Course Cost: {%cost%}<br />
+                    Course Capacity: {%capacity%}<br />
+                    Course Status: {%status%}<br />
+                    Course Order: {%order%}<br />
+                    Course Award: {%award%}<br />
+                    Course Awarding Body: {%awarding_body%}<br />
+                    Course Start Date: {%start_date%}<br />
+                    Course Start Time: {%start_time%}<br />
+                    Course End Date: {%end_date%}<br />
+                    Course End Time: {%end_time%}<br />
+                    Course Duration: {%duration%}<br />
+                    Course Location: {%location%}<br />
+                    Course Trainer Name: {%trainer_name%}<br />
+                    Course Trainer Email: {%trainer_email%}<br />
+                    Course Training Provider: {%training_provider%}<br />
+                    Course Training Aim: {%training_aim%}<br />
+                    Course Primary Target Grade: {%primary_target_grade%}<br />
+                    Course Other Grades Applicable: {%other_grades_applicable%}<br />
+                    Course Expiry Period: {%expiry_period%}<br />
+                    Course Link To More Information: {%link_to_more_information%}<br />
+                    Course Order: {%course_order%}<br />
+                    Course Applicable Regulation: {%applicable_regulation%}<br />
+                </p>
             </div>
-            <div>
-                 <p>Order Details. Only applies for emails with orders ie order Cancellation.</p>
-                    <p>
-                        First Name: {%first_name%}<br />
-                        Last Name: {%last_name%}<br />
-                        Phone Name: {%phone%}<br />
-                        Address 1: {%address_one%}<br />
-                        Address 2: {%address_two%}<br />
-                        City: {%city%}<br />
-                        Eircode: {%eircode%}<br />
-                        Country: {%country%}<br />
-                        County: {%county%}<br />
-                        Order Status: {%order_status%}<br />
-                    </p>
+            <div style="margin-left: 12px">
+                <p><strong>Order Details. <small>Only applies for emails with orders ie order Cancellation</small>.</strong></p>
+                <p>
+                    First Name: {%first_name%}<br />
+                    Last Name: {%olast_name%}<br />
+                    Phone Name: {%phone%}<br />
+                    Address 1: {%address_one%}<br />
+                    Address 2: {%address_two%}<br />
+                    City: {%city%}<br />
+                    Eircode: {%eircode%}<br />
+                    Country: {%country%}<br />
+                    County: {%county%}<br />
+                    Order Status: {%order_status%}<br />
+                </p>
+            </div>
+            <div style="margin-left: 12px">
+                <p><strong>Receiver info <small>National, Regional or Training officer</small></strong></p>
+                <p>
+                    Name: {%to_name%}<br />
+                    Email: {%to_user_email%}<br />
+                    Department: {%to_user_department%}<br />
+                    Phone: {%to_user_phone%}<br />
+                </p>
             </div>
         </div>
-        <table>
-            <tr>
-                <td>
-                    
-                </td>
-                <td>
-                    <p>Order Details. Only applies for emails with orders ie order Cancellation.</p>
-                    <p>
-                        First Name: {%first_name%}<br />
-                        Last Name: {%last_name%}<br />
-                        Phone Name: {%phone%}<br />
-                        Address 1: {%address_one%}<br />
-                        Address 2: {%address_two%}<br />
-                        City: {%city%}<br />
-                        Eircode: {%eircode%}<br />
-                        Country: {%country%}<br />
-                        County: {%county%}<br />
-                        Order Status: {%order_status%}<br />
-                    </p>
-                </td>
-            </tr>
-        </table>
+
+
     <?php
     }
 
@@ -265,10 +219,19 @@ class OptionsPage
         self::$optionsSanitized =  true;
 
         $sanitary_values = array();
-        $text_fields = ['course_cancellation', 'course_creation', 'cancel_waiting_order', 'status_change'];
+        $text_fields = [
+            'course_cancellation',
+            'course_creation',
+            'cancel_waiting_order',
+            'status_change',
+            'training_centre_confirms_order',
+            'order_cancellation',
+            'status_set_to_enrolling',
+            'course_update'
+        ];
         foreach ($text_fields as $text_field) {
             if (isset($input[$text_field])) {
-                $sanitary_values[$text_field] = sanitize_text_field($input[$text_field]);
+                $sanitary_values[$text_field] = wp_kses_post($input[$text_field]);
             }
         }
         return $sanitary_values;
