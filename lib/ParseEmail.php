@@ -11,7 +11,7 @@ class ParseEmail
             'name' => $product->get_title(),
             'cost' => $product->get_price(),
             'capacity' => $product->get_stock_quantity(),
-            'status' => $product->get_stock_status(),
+            'status' => $product->get_status(),
             'event_type' => get_field('field_6387864196776', $post_ID, true),
             'awarding_body' => get_field('field_638786be96777', $post_ID, true),
             'start_date' => get_field('field_63881aee31478', $post_ID, true),
@@ -34,8 +34,7 @@ class ParseEmail
             'link_to_more_information' => get_field('field_6388216175740', $post_ID, true),
             'course_order' => get_field('field_6388218175741', $post_ID, true),
         ];
-        $message = self::replace($message, $course_fields);
-        return apply_filters( 'the_content', $message );
+        return self::replace($message, $course_fields);
     }
 
     private static function replace($message, $fields)

@@ -1,77 +1,33 @@
 <?php
 
-namespace Lasntg\Admin\Subscriptions;
+namespace Lasntg\Admin\Subscriptions\OptionPages;
 
-class OptionsPage
+use Lasntg\Admin\Subscriptions\Editors;
+
+class NationalManagerOptions extends OptionPage
 {
     use Editors;
-
-    protected static $options;
-    protected static $optionName = 'lasntg_subscriptions_options';
-    private static $optionsSanitized = false;
-
-    /**
-     * Slug of currently active tab
-     *
-     * @var string
-     */
-    protected static $activeTab;
-
-
-    /**
-     * @var string Slug of this tab
-     */
-    private static $tabName = 'national_manager';
-
     public static function init()
     {
-        self::$activeTab = isset($_GET['tab']) ? $_GET['tab'] : self::$activeTab;
-
-        if (is_admin() && self::$activeTab == self::$tabName) {
-            add_action('admin_menu', [self::class, 'add_plugin_page']);
+        parent::$tabName = 'national_manager';
+        parent::init();
+        if (is_admin() && static::$activeTab == static::$tabName) {
+            parent::$optionName = 'lasntg_subscriptions_options';
+            Editors::$optionName = 'lasntg_subscriptions_options';
+            add_action('admin_menu', [static::class, 'add_plugin_page']);
+            add_action('admin_init', [static::class, 'page_init']);
         }
-        add_action('admin_init', [self::class, 'page_init']);
     }
-    /**
-     * Prints page content
-     */
-    public static function loadPageContent()
-    {
-?>
-        <form method="post" action="options.php">
-            <?php
-            settings_fields(self::$optionName);
-            do_settings_sections(self::$optionName);
-            submit_button();
-            ?>
-        </form>
-    <?php
-    }
-    /**
-     * Loads settings fields
-     */
     public static function page_init()
     {
-        register_setting(
-            self::$optionName,                                  // option_group
-            self::$optionName,                              // option_name
-            [self::class, 'sanitize']                             // sanitize_callback
+        parent::register_setting();
+        add_settings_section(
+            'national_manager',                             // id
+            '',                                             // title
+            [static::class, 'section_info'],                        // callback
+            self::$optionName                    // page
         );
 
-        add_settings_section(
-            'message_settings',                             // id
-            '',                                             // title
-            [self::class, 'section_info'],                        // callback
-            self::$optionName                    // page
-        );
-        
-        add_settings_section(
-            'training_officers',                             // id
-            '',                                             // title
-            [self::class, 'training_officer_messages'],                        // callback
-            self::$optionName                    // page
-        );
-        
         add_settings_field(
             'course_update_subject',                                    // id
             __('Course Update Subject', 'lasntgadmin'),          // title
@@ -197,13 +153,12 @@ class OptionsPage
         );
     }
 
-
     /**
      * Prints tab section info
      */
     public static function section_info()
     {
-    ?>
+?>
         <p>
             <?= __('Messages can have info from courses and orders.', 'lasntgadmin') ?>
         </p>
@@ -266,9 +221,8 @@ class OptionsPage
         </div>
 
 
-    <?php
+<?php
     }
-  
 
     /**
      * Sanitizes settings form input
@@ -277,7 +231,7 @@ class OptionsPage
      *
      * @return array
      */
-    public static function sanitize($input)
+    public static function sanitize($input): array
     {
         // Fix for issue that options are sanitized twice when no db entry exists
         // "It seems the data is passed through the sanitize function twice.[...]
@@ -313,46 +267,12 @@ class OptionsPage
             'order_cancellation_subject',
             'status_set_to_enrolling_subject',
         ];
-        foreach($text_fields as $text_field){
-            if(isset($input[$text_field])) {
-                $sanitary_values[$text_field] = sanitize_text_field( $input[$text_field] );
+        foreach ($text_fields as $text_field) {
+            if (isset($input[$text_field])) {
+                $sanitary_values[$text_field] = sanitize_text_field($input[$text_field]);
             }
         }
-        
+
         return $sanitary_values;
-
     }
-
-    /**
-     * Adds plugin settings page to admin
-     */
-    public static function add_plugin_page()
-    {
-        add_options_page(
-            __('Lasntg Subscriptions', 'lasngtadmin'), // page_title
-            __('Lasntg Subscriptions', 'lasngtadmin'), // menu_title
-            'manage_options',                               // capability
-            'lasntg-subscriptions',                           // menu_slug
-            [self::class, 'create_admin_page']                    // callback function
-        );
-    }
-
-    /**
-     * Creates header of admin settings page
-     * Expects loadPageContent() to exist in child class
-     */
-    public static function create_admin_page()
-    {
-    ?><div class="wrap">
-            <h2><?= __('Lasntg Subscriptions', 'lasngtadmin') ?></h2>
-
-            <h2 class="nav-tab-wrapper">
-                <a href="?page=lasngtadmin-subscriptions&tab=national_manager" class="nav-tab <?php echo self::$activeTab == 'national_manager' ? 'nav-tab-active' : '' ?>"><?= __('Messages', 'lasngtadmin') ?></a>
-                <a href="?page=lasngtadmin-subscriptions&tab=training_officers" class="nav-tab <?php echo self::$activeTab == 'training_officers' ? 'nav-tab-active' : '' ?>"><?= __('Training Officers', 'lasngtadmin') ?></a>
-                <a href="?page=lasngtadmin-subscriptions&tab=advanced" class="nav-tab <?php echo self::$activeTab == 'advanced' ? 'nav-tab-active' : '' ?>"><?= __('Settings', 'lasngtadmin') ?></a>
-            </h2>
-
-            <?php call_user_func([self::class, 'loadPageContent']); ?>
-        </div><?php
-            }
-        }
+}
