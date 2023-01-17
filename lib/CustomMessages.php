@@ -18,12 +18,13 @@ class CustomMessages
         if ('product' !== $post_type) {
             return;
         }
-?>
+    ?>
         <div id="my-content-id" style="display:none; width:100%; height: 100%">
             <form id="course_cancellation_form">
                 <h3>
                     Please enter custom cancellation Subject and Message.
                 </h3>
+                <p>Please note all field variables are available and can be used in here.</p>
 
                 <label for="custom_cancellation_subject">Subject</label>
                 <input class="regular-text" type="text" name="custom_cancellation_subject" id="custom_cancellation_subject" value="<?= get_post_meta($post->ID, '_cancellation_subject', true) ?>">

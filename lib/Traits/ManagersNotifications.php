@@ -2,8 +2,9 @@
 
 namespace Lasntg\Admin\Subscriptions\Traits;
 
-trait ManagersNotifications{
- public static function notify_managers_new_course($post_ID)
+trait ManagersNotifications
+{
+    public static function notify_managers_new_course($post_ID)
     {
         self::get_content($post_ID, 'course_update_subject', 'course_update');
     }
@@ -20,5 +21,4 @@ trait ManagersNotifications{
     {
         self::get_content($post_ID, 'course_cancellation_subject', 'course_cancellation');
     }
-
 }

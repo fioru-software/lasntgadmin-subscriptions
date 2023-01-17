@@ -5,13 +5,29 @@
         if (!$('#' + wp_editor).length) {
             return;
         }
+        const post_status = $('select[name="post_status"]');
         status.after(
-            '<div class="misc-pub-section">' +
+            '<div class="misc-pub-section" id="open-custom-cancellation-msg-div">' +
             '<span>' +
             '<a id="open-custom-cancellation-msg" href="#TB_inline?&width=600&height=500&inlineId=my-content-id" class="thickbox">Custom Cancellation Message</a>' +
             '</</span>' +
             '</div>'
         );
+
+        function show_hide_parent() {
+            const parent_div = $('#open-custom-cancellation-msg-div');
+            console.log('post_status', post_status.val())
+            if (post_status.val() === 'cancelled') {
+                parent_div.show()
+            } else {
+                parent_div.hide();
+            }
+        }
+        show_hide_parent();
+        $('.save-post-status').on('click', function () {
+            show_hide_parent();
+        })
+
 
         $("#open-custom-cancellation-msg").click(function () {
             setTimeout(function () {
@@ -60,6 +76,17 @@
                     console.log('before_send')
                     $this.prop('disabled', true);
                 },
+                success: function(resp){
+                    $this.prop('disabled', false);
+                    if(resp.status == 1){
+                        alert('saved');
+                        return;
+                    }
+                    alert(resp.msg);
+                },
+                error: function(){
+                    alert('An error occurred. Please try again.')
+                }
             })
             return false;
         })
