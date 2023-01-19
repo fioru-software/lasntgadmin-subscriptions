@@ -14,14 +14,12 @@ defined( 'ABSPATH' ) || exit;
 // composer autoloading.
 require_once getenv( 'COMPOSER_AUTOLOAD_FILEPATH' );
 
-use Lasntg\Admin\Subscriptions\{ PluginUtils, CronScheduler, SubscriptionActionsFilters, CustomMessages};
+use Lasntg\Admin\Subscriptions\{ PluginUtils, SubscriptionActionsFilters, CustomMessages};
 use Lasntg\Admin\Subscriptions\OptionPages\{NationalManagerOptions, TrainingOfficersOptions};
 
 register_activation_hook( __FILE__, [ PluginUtils::class, 'activate' ] );
 register_deactivation_hook( __FILE__, [ PluginUtils::class, 'deactivate' ] );
 
-CronScheduler::add_filters();
-CronScheduler::add_actions();
 SubscriptionActionsFilters::init();
 NationalManagerOptions::init();
 TrainingOfficersOptions::init();

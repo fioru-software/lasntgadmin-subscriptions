@@ -14,7 +14,6 @@ class SubscriptionActionsFilters {
 		if ( 'product' !== $post_after->post_type ) {
 			return;
 		}
-		Notifications::course_cancelled( $post_ID );
 		if ( $post_after->post_status !== $post_before->post_status ) {
 			if ( 'cancelled' === $post_after->post_status ) {
 				Notifications::course_cancelled( $post_ID );
