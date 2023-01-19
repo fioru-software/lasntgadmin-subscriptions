@@ -7,7 +7,7 @@ ARG GITHUB_TOKEN
 
 RUN a2enmod rewrite                                                                                                                                                                           
 RUN apt update; \
-    apt install -y default-mysql-client vim libzip-dev unzip libpng-dev libmagickwand-dev libicu-dev subversion ssl-cert
+    apt install -y default-mysql-client vim libzip-dev unzip libpng-dev libmagickwand-dev libicu-dev subversion ssl-cert cron
 
 RUN pecl install --configureoptions='with-imagick="autodetect"' imagick; \
     docker-php-ext-enable imagick
@@ -44,7 +44,13 @@ COPY --chown=www-data:www-data plugins/* /tmp/plugins/
 RUN for plugin in /tmp/plugins/*.zip; do if [ -f $plugin ]; then unzip -q $plugin -d /var/www/html/wp-content/plugins/; fi; done;
 
 USER root
+
+# SSL
 RUN a2enmod ssl; \
     a2ensite default-ssl;
+
+# cron
+RUN echo '* * * * * /bin/bash /usr/local/src/scripts/cron.sh > /var/log/apache2/cron.log 2>&1' > /etc/cron.d/wordpress;\
+    crontab -u www-data /etc/cron.d/wordpress
 
 CMD ["/usr/local/src/scripts/run.sh"]
