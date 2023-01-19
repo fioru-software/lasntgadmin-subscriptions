@@ -12,18 +12,13 @@ Configure the [WP SMTP Mailing Queue plugin](https://wordpress.org/plugins/smtp-
 
 My suggestion would be to create your own [Mailtrap Inbox](https://mailtrap.io/) account, but a shared account is aslo available on our [Bitwarden](https://bitwarden.veri.ie).
 
-> Admin > Settings > SMTP Mailing Queue > Advanced 
+> Admin > Settings SMTP Mailing Queue > Advanced Settings
 
-Don't use wp_cron = true;
+![Screenshot of recommended settings](screenshots/smtp-mailing-queue-advanced-settings.png)
 
-### Running Cron
+__NB__: Set `Secret Key` to `secret`.
 
-```sh
-# list all cron events
-wp cron event list
-# manually trigger cron (smtp-mailing-queue required $_GET param
-wp cron event run --due-now --exec='$_GET["smqProcessQueue"]=1;'
-```
+You can view cron logs by tailing `/var/log/apache2/cron.log`.
 
 ### PHP
 
