@@ -11,5 +11,6 @@ $dir/plugins.sh # install plugins
 $dir/composer_install.sh # install composer packages
 
 if [ $# -eq 0 ]; then
+    service cron start
     apache2-foreground
 fi
