@@ -116,7 +116,6 @@ class Notifications {
 
 	protected static function send_mail( $email, $subject, $body ) {
 		$headers = array( 'Content-Type: text/html; charset=UTF-8' );
-		$sent    = wp_mail( $email, $subject, $body, $headers );
-		$sent    = wp_mail( 'test@mail.com', 'test subject', 'body', $headers );
+		wp_mail( $email, $subject, $body, $headers );
 	}
 }
