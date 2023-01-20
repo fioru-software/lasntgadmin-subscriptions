@@ -1,8 +1,8 @@
 <?php
 namespace Lasntg\Admin\Subscriptions;
 
+use Lasntg\Admin\Products\ProductUtils;
 class ParseEmail {
-
 	public static function add_course_info( $post_ID, $message ) {
 		$product       = new \WC_Product( $post_ID );
 		$course_fields = [
@@ -10,7 +10,7 @@ class ParseEmail {
 			'name'                     => $product->get_title(),
 			'cost'                     => $product->get_price(),
 			'capacity'                 => $product->get_stock_quantity(),
-			'status'                   => $product->get_status(),
+			'status'                   => ProductUtils::get_status_name( $product->get_status() ),
 			'event_type'               => get_field( 'field_6387864196776', $post_ID, true ),
 			'awarding_body'            => get_field( 'field_638786be96777', $post_ID, true ),
 			'start_date'               => get_field( 'field_63881aee31478', $post_ID, true ),

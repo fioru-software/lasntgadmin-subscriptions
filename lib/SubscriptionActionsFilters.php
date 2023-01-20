@@ -2,6 +2,8 @@
 
 namespace Lasntg\Admin\Subscriptions;
 
+use Lasntg\Admin\Products\ProductUtils;
+
 class SubscriptionActionsFilters {
 
 	public static function init(): void {
@@ -17,12 +19,14 @@ class SubscriptionActionsFilters {
 		if ( $post_after->post_status !== $post_before->post_status ) {
 			if ( 'cancelled' === $post_after->post_status ) {
 				Notifications::course_cancelled( $post_ID );
+				return;
+			}
+			if ( ProductUtils::$publish_status === $post_after->post_status ) {
+				Notifications::open_for_enrollment( $post_ID );
+				return;
 			}
 		}
-
-		if ( 'cancelled' !== $post_after->post_status ) {
-			Notifications::notify_managers_course_updated( $post_ID );
-		}
+		Notifications::notify_managers_course_updated( $post_ID );
 	}
 
 	public static function new_course( $post_id, $post, $update ) {

@@ -8,7 +8,7 @@ trait ManagersNotifications {
 		self::get_content( $post_ID, 'course_update_subject', 'course_update' );
 	}
 	public static function notify_managers_course_status_changed( $post_ID ) {
-		self::get_content( $post_ID, 'course_cancellation_subject', 'course_cancellation' );
+		self::get_content( $post_ID, 'status_change_subject', 'status_change' );
 	}
 	public static function notify_managers_course_updated( $post_ID ) {
 		self::get_content( $post_ID, 'course_update_subject', 'course_update' );

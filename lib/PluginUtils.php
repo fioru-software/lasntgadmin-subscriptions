@@ -2,7 +2,7 @@
 
 namespace Lasntg\Admin\Subscriptions;
 
-use Lasntg\Admin\Subscriptions\{ Capabilities, CronScheduler };
+use Lasntg\Admin\Subscriptions\{ Capabilities};
 
 /**
  * Plugin utilities
@@ -11,12 +11,10 @@ class PluginUtils {
 
 	public static function activate() {
 		Capabilities::add();
-		CronScheduler::add_event();
 	}
 
 	public static function deactivate() {
 		Capabilities::remove();
-		CronScheduler::remove_event();
 	}
 
 	public static function get_camel_case_name(): string {
