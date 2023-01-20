@@ -79,14 +79,11 @@ class Notifications {
 		self::get_content_for_users( $users, $post_ID, 'course_cancellation_subject', 'course_cancellation' );
 	}
 
-	public static function course_updated($post_ID)
-	{
+	public static function course_updated( $post_ID ) {
 		self::notify_managers_course_updated( $post_ID );
 	}
 
-	public static function open_for_enrollment($post_id)
-	{
-		
+	public static function open_for_enrollment( $post_id ) {
 	}
 	protected static function get_email_subject_and_body( $post_ID, $subject, $body ) {
 		$email_subject = Editors::get_options( $subject );

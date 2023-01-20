@@ -21,14 +21,12 @@ class SubscriptionActionsFilters {
 				Notifications::course_cancelled( $post_ID );
 				return;
 			}
-			if( ProductUtils::$publish_status === $post_after->post_status) {
-				
-				Notifications::open_for_enrollment($post_ID);
+			if ( ProductUtils::$publish_status === $post_after->post_status ) {
+				Notifications::open_for_enrollment( $post_ID );
 				return;
 			}
 		}
 		Notifications::notify_managers_course_updated( $post_ID );
-
 	}
 
 	public static function new_course( $post_id, $post, $update ) {
