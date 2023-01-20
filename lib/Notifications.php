@@ -88,7 +88,6 @@ class Notifications {
 	{
 		
 	}
-
 	protected static function get_email_subject_and_body( $post_ID, $subject, $body ) {
 		$email_subject = Editors::get_options( $subject );
 		$email_body    = Editors::get_options( $body );

@@ -2,7 +2,6 @@
 namespace Lasntg\Admin\Subscriptions;
 use Lasntg\Admin\Products\ProductUtils;
 class ParseEmail {
-	
 	public static function add_course_info( $post_ID, $message ) {
 		$product       = new \WC_Product( $post_ID );
 		$course_fields = [

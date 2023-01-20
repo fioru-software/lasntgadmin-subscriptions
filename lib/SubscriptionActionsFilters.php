@@ -16,8 +16,6 @@ class SubscriptionActionsFilters {
 		if ( 'product' !== $post_after->post_type ) {
 			return;
 		}
-		var_dump(ProductUtils::$statuses);
-		die();
 		if ( $post_after->post_status !== $post_before->post_status ) {
 			if ( 'cancelled' === $post_after->post_status ) {
 				Notifications::course_cancelled( $post_ID );
@@ -30,6 +28,7 @@ class SubscriptionActionsFilters {
 			}
 		}
 		Notifications::notify_managers_course_updated( $post_ID );
+
 	}
 
 	public static function new_course( $post_id, $post, $update ) {
