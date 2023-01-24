@@ -1,8 +1,8 @@
 <?php
 
-namespace Lasntg\Admin\Subscriptions\Traits;
+namespace Lasntg\Admin\Subscriptions\Notifications;
 
-trait TrainingCenterNotifications {
+class TrainingCenterNotifications {
 	public static function notify_officers_new_course( $post_ID ) {
 	}
 

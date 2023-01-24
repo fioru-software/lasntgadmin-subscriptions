@@ -6,22 +6,26 @@ use Lasntg\Admin\Subscriptions\Editors;
 
 class TrainingOfficersOptions extends OptionPage {
 
-	use Editors;
 	public static function init(): void {
 		parent::$tab_name = 'training_officers';
 		parent::init();
 		if ( is_admin() && static::$active_tab == static::$tab_name ) {
 			parent::$option_name = 'lasntg_subscriptions_training_officers';
-
 			add_action( 'admin_init', [ static::class, 'page_init' ] );
 		}
-		add_action( 'admin_menu', [ static::class, 'add_plugin_page' ] );
 	}
 	public static function load_page_content(): void {
 	}
 	public static function page_init(): void {
 		parent::register_setting();
 
+		add_settings_section(
+			'message_settings',
+			'',
+			[ static::class, 'section_info' ],
+			self::$option_name
+		);
+		return;
 		add_settings_field(
 			'course_cancelled',
 			__( 'Course Cancelled Subject', 'lasntgadmin' ),

@@ -17,27 +17,30 @@ class SubscriptionActionsFilters {
 			return;
 		}
 		if ( $post_after->post_status !== $post_before->post_status ) {
-			if ( 'cancelled' === $post_after->post_status ) {
-				Notifications::course_cancelled( $post_ID );
-				return;
-			}
 			if ( ProductUtils::$publish_status === $post_after->post_status ) {
 				Notifications::open_for_enrollment( $post_ID );
 				return;
 			}
+
+			if ( 'cancelled' === $post_after->post_status ) {
+				Notifications::course_cancelled( $post_ID );
+				return;
+			} else {
+				Notifications::course_status_change( $post_ID, $post_after->post_status, $post_before->post_status );
+			}
 		}
-		Notifications::notify_managers_course_updated( $post_ID );
+		Notifications::course_updated( $post_ID );
 	}
 
 	public static function new_course( $post_id, $post, $update ) {
 		if (
 			'product' === $post->post_type
 			&& 'open_for_enrollment' === $post->post_status
-			&& empty( get_post_meta( $post_id, 'check_if_run_once' ) )
+			&& ( empty( get_post_meta( $post_id, 'check_if_run_once' ) ) || get_post_meta( $post_id, 'check_if_run_once' ) !== $post_id )
 		) {
-			Notifications::notify_managers_new_course( $post );
+			Notifications::new_course( $post_id );
 			// And update the meta so it won't run again.
-			update_post_meta( $post_id, 'check_if_run_once', true );
+			update_post_meta( $post_id, 'check_if_run_once', $post_id );
 		}
 	}
 }

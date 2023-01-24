@@ -1,5 +1,5 @@
 <?php
-namespace Lasntg\Admin\Subscriptions;
+namespace Lasntg\Admin\Subscriptions\Notifications;
 
 use Lasntg\Admin\Products\ProductUtils;
 class ParseEmail {
