@@ -181,7 +181,7 @@ abstract class OptionPage {
 				<p>
 					Name: {%to_user_name%}<br />
 					Email: {%to_user_email%}<br />
-					Department: {%to_user_department%}<br />
+					Department: {%to_user_department%} <small>(If National Managaer)</small><br />
 					Phone: {%to_user_phone%}<br />
 				</p>
 			</div>
