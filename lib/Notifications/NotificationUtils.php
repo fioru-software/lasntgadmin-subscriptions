@@ -37,7 +37,7 @@ class NotificationUtils {
 	 *
 	 * @return array
 	 */
-	public static function get_users_by_product_orders( $product_id, $order_status = array( 'wc-processing', 'wc-completed' ) ) {
+	public static function get_users_by_product_orders( $product_id, $order_status = array( 'wc-cancelled', 'wc-processing', 'wc-completed' ) ) {
 		global $wpdb;
 		$args = implode( ',', array_fill( 0, count( $order_status ), '%s' ) );
 
@@ -66,7 +66,10 @@ class NotificationUtils {
 	protected static function get_email_subject_and_body( $post_ID, $subject, $body ) {
 		$email_subject = Editors::get_options( $subject );
 		$email_body    = Editors::get_options( $body );
+		return self::parse_info( $post_ID, $email_subject, $email_body );
+	}
 
+	public static function parse_info( $post_ID, $email_subject, $email_body ) {
 		$email_subject = ParseEmail::add_course_info( $post_ID, $email_subject );
 		$email_body    = ParseEmail::add_course_info( $post_ID, $email_body );
 		$email_body    = apply_filters( 'the_content', $email_body ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
@@ -82,11 +85,12 @@ class NotificationUtils {
 		self::parse_emails_for_users( $users, $email['subject'], $email['body'] );
 	}
 
-	public static function get_content( $post_ID, $subject, $body ) {
+	public static function get_content( $post_ID, $subject, $body, $user_role = 'national_manager' ) {
+		Editors::$option_name = 'lasntg_subscriptions_training_officers';
 		$email         = self::get_email_subject_and_body( $post_ID, $subject, $body );
 		$email_subject = $email['subject'];
 		$email_body    = $email['body'];
-		$users         = self::get_users_in_group( $post_ID );
+		$users         = self::get_users_in_group( $post_ID, $user_role );
 		self::parse_emails_for_users( $users, $email_subject, $email_body );
 	}
 	public static function parse_emails_for_users( $users, $subject, $body ) {
@@ -99,6 +103,7 @@ class NotificationUtils {
 
 	protected static function send_mail( $email, $subject, $body ) {
 		$headers = array( 'Content-Type: text/html; charset=UTF-8' );
-		wp_mail( $email, $subject, $body, $headers );
+		$sent    = wp_mail( $email, $subject, $body, $headers );
+		error_log( "Sent: $sent, $email" );
 	}
 }

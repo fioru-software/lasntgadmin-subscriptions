@@ -16,9 +16,6 @@ class GeneralOptions extends OptionPage {
 		}
 	}
 
-	public static function load_page_content(): void {
-	}
-
 	public static function page_init(): void {
 		self::$option_name = 'lasntg_subscriptions_general';
 

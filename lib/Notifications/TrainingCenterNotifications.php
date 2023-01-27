@@ -2,15 +2,8 @@
 
 namespace Lasntg\Admin\Subscriptions\Notifications;
 
-class TrainingCenterNotifications {
-	public static function notify_officers_new_course( $post_ID ) {
-	}
+use Lasntg\Admin\Subscriptions\OptionPages\Editors;
 
-	public static function notify_officers_course_updated( $post_ID ) {
-	}
-	public static function notify_officers_course_cancelled( $post_ID ) {
-	}
-
-	public static function notify_officers_course_status_changed( $post_ID ) {
-	}
+class TrainingCenterNotifications extends BaseNotification {
+	protected static $option_name = 'lasntg_subscriptions_training_officers';
 }

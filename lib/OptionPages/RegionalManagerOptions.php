@@ -3,11 +3,11 @@
 namespace Lasntg\Admin\Subscriptions\OptionPages;
 
 
-class NationalManagerOptions extends OptionPage
+class RegionalManagerOptions extends OptionPage
 {
-	protected static $option_name_ = 'lasntg_subscriptions_options';
-	protected static $tab_name = 'national_manager';
-	protected static $tab_settings = 'message_settings';
+	protected static $option_name_ = 'lasntg_subscriptions_regional_options';
+	protected static $tab_name = 'regional_manager';
+	protected static $tab_settings = 'regional_settings';
 
 	public static function init()
 	{
@@ -20,9 +20,9 @@ class NationalManagerOptions extends OptionPage
 	{
 		parent::$option_name = self::$option_name_;
 		Editors::$option_name = static::$option_name;
-		// self::$tab_settings = 'message_settings';
+		self::$tab_settings = 'message_settings';
 		add_settings_section(
-			'message_settings',
+			self::$tab_settings,
 			'',
 			[ static::class, 'section_info' ],
 			self::$option_name

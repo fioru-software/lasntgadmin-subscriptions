@@ -15,7 +15,7 @@ defined( 'ABSPATH' ) || exit;
 require_once getenv( 'COMPOSER_AUTOLOAD_FILEPATH' );
 
 use Lasntg\Admin\Subscriptions\{ PluginUtils, SubscriptionActionsFilters, CustomMessages};
-use Lasntg\Admin\Subscriptions\OptionPages\{NationalManagerOptions, TrainingOfficersOptions, GeneralOptions};
+use Lasntg\Admin\Subscriptions\OptionPages\{NationalManagerOptions, TrainingOfficersOptions, GeneralOptions, RegionalManagerOptions};
 
 register_activation_hook( __FILE__, [ PluginUtils::class, 'activate' ] );
 register_deactivation_hook( __FILE__, [ PluginUtils::class, 'deactivate' ] );
@@ -23,6 +23,7 @@ register_deactivation_hook( __FILE__, [ PluginUtils::class, 'deactivate' ] );
 SubscriptionActionsFilters::init();
 NationalManagerOptions::init();
 TrainingOfficersOptions::init();
+RegionalManagerOptions::init();
 GeneralOptions::init();
 CustomMessages::init();
 

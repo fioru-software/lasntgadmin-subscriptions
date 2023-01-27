@@ -108,10 +108,7 @@ class Editors {
 	}
 
 	public static function get_options( $name ) {
-		if ( ! self::$options ) {
-			self::$options = get_option( self::$option_name );
-		}
-
+		self::$options = get_option( self::$option_name );
 		return self::$options && isset( self::$options[ $name ] ) ? self::$options[ $name ] : '';
 	}
 }

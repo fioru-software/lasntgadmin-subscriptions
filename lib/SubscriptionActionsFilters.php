@@ -11,11 +11,11 @@ class SubscriptionActionsFilters {
 		add_action( 'wp_insert_post', [ self::class, 'new_course' ], 1, 3 );
 	}
 
-
-	public static function wp_insert_post( $post_ID, $post_after, $post_before ) {
+	public static function wp_insert_post( $post_ID, $post_after, $post_before ): void {
 		if ( 'product' !== $post_after->post_type ) {
 			return;
 		}
+		Notifications::course_cancelled( $post_ID );
 		if ( $post_after->post_status !== $post_before->post_status ) {
 			if ( ProductUtils::$publish_status === $post_after->post_status ) {
 				Notifications::open_for_enrollment( $post_ID );
@@ -27,12 +27,17 @@ class SubscriptionActionsFilters {
 				return;
 			} else {
 				Notifications::course_status_change( $post_ID, $post_after->post_status, $post_before->post_status );
+				return;
 			}
+		} elseif ( 'draft' === $post_after->post_status ) {
+			// do not send notifications for drafts.
+			return;
 		}
 		Notifications::course_updated( $post_ID );
 	}
 
-	public static function new_course( $post_id, $post, $update ) {
+	public static function new_course( $post_id, $post, $update ): void {
+		Notifications::new_course( $post_id );
 		if (
 			'product' === $post->post_type
 			&& 'open_for_enrollment' === $post->post_status
