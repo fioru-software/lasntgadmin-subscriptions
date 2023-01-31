@@ -4,6 +4,7 @@ namespace Lasntg\Admin\Subscriptions;
 
 use Lasntg\Admin\Subscriptions\Notifications\ManagersNotifications;
 use Lasntg\Admin\Subscriptions\Notifications\NotificationUtils;
+use Lasntg\Admin\Subscriptions\Notifications\RegionalManagerNotifications;
 use Lasntg\Admin\Subscriptions\Notifications\TrainingCenterNotifications;
 
 class Notifications {
@@ -25,12 +26,15 @@ class Notifications {
 	}
 
 	public static function course_updated( $post_ID ) {
-		TrainingCenterNotifications::course_updated($post_ID);
+		error_log("Updated!!!");
 		ManagersNotifications::course_updated( $post_ID );
+		RegionalManagerNotifications::course_updated($post_ID);
+		TrainingCenterNotifications::course_updated($post_ID);
 	}
 	public static function course_status_change( $post_ID, $post_after, $post_before ) {
 		TrainingCenterNotifications::status_changed($post_ID);
 		ManagersNotifications::status_changed( $post_ID );
+		RegionalManagerNotifications::status_changed( $post_ID );
 	}
 	public static function open_for_enrollment( $post_id ) {
 	}
@@ -38,6 +42,7 @@ class Notifications {
 	public static function new_course( $post_ID ) {
 		ManagersNotifications::new_course( $post_ID );
 		TrainingCenterNotifications::new_course($post_ID);
+		RegionalManagerNotifications::new_course($post_ID);
 	}
 
 

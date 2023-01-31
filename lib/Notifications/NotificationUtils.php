@@ -4,20 +4,38 @@ namespace Lasntg\Admin\Subscriptions\Notifications;
 
 use Lasntg\Admin\Subscriptions\OptionPages\Editors;
 
-class NotificationUtils {
+class NotificationUtils
+{
 
 	/**
 	 * Should be placed in groups plugin.
 	 */
-	public static function get_post_group_ids( $post_ID ) {
-		return \Groups_Post_Access::get_read_group_ids( $post_ID );
+	public static function get_post_group_ids($post_ID)
+	{
+		return \Groups_Post_Access::get_read_group_ids($post_ID);
 	}
-	public static function get_users_in_group( $post_ID, $user_role = 'national_manager' ) {
+	public static function get_users_in_group($post_ID, $role = 'national_manager')
+	{
 		global $wpdb;
-		$user_role = "%$user_role%";
-		$group_ids = self::get_post_group_ids( $post_ID );
-		$params    = array_merge( [ $user_role ], $group_ids );
-		$string_s  = implode( ', ', array_fill( 0, count( $group_ids ), '%s' ) );
+
+		$user_role = "%$role%";
+		$group_ids = self::get_post_group_ids($post_ID);
+		//check quotas for training officer.
+		if ("training_officer" === $role) {
+			foreach ($group_ids as $key => $group_id) {
+				$value = get_post_meta($post_ID, "_quotas_field_" . $group_id, true);
+
+				if (is_numeric($value) && 0 === (int)$value) {
+					unset($group_ids[$key]);
+				}
+			}
+		}
+		if(!$group_ids){
+			return [];
+		}
+
+		$params    = array_merge([$user_role], $group_ids);
+		$string_s  = implode(', ', array_fill(0, count($group_ids), '%s'));
 		$query     = "select u.ID, u.display_name, u.user_email From wp_users u
                   INNER JOIN wp_usermeta um
                   on um.user_id = u.ID
@@ -25,8 +43,9 @@ class NotificationUtils {
                   on g.user_id = u.ID
                   where meta_value like %s
                   and meta_key = 'wp_capabilities'
-                  and g.group_id in ($string_s)";
-		return $wpdb->get_results( $wpdb->prepare( $query, $params ) ); //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+                  and g.group_id in ($string_s) GROUP BY u.ID";
+		//if $user_role is training_officer, check quoata for that group.
+		return $wpdb->get_results($wpdb->prepare($query, $params)); //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 	}
 
 	/**
@@ -37,9 +56,10 @@ class NotificationUtils {
 	 *
 	 * @return array
 	 */
-	public static function get_users_by_product_orders( $product_id, $order_status = array( 'wc-cancelled', 'wc-processing', 'wc-completed' ) ) {
+	public static function get_users_by_product_orders($product_id, $order_status = array('wc-cancelled', 'wc-processing', 'wc-completed'))
+	{
 		global $wpdb;
-		$args = implode( ',', array_fill( 0, count( $order_status ), '%s' ) );
+		$args = implode(',', array_fill(0, count($order_status), '%s'));
 
 		$results = $wpdb->get_results(
 			$wpdb->prepare(
@@ -56,54 +76,70 @@ class NotificationUtils {
 			AND order_item_meta.meta_value = %s
             GROUP BY posts.post_author
 			",
-				array_merge( $order_status, [ $product_id ] )
+				array_merge($order_status, [$product_id])
 			)
 		);
 
 		return $results;
 	}
 
-	protected static function get_email_subject_and_body( $post_ID, $subject, $body ) {
-		$email_subject = Editors::get_options( $subject );
-		$email_body    = Editors::get_options( $body );
-		return self::parse_info( $post_ID, $email_subject, $email_body );
+	protected static function get_email_subject_and_body($post_ID, $subject, $body)
+	{
+		$email_subject = Editors::get_options($subject);
+		$email_body    = Editors::get_options($body);
+		if (!$email_subject || !$email_body) {
+			return false;
+		}
+		return self::parse_info($post_ID, $email_subject, $email_body);
 	}
 
-	public static function parse_info( $post_ID, $email_subject, $email_body ) {
-		$email_subject = ParseEmail::add_course_info( $post_ID, $email_subject );
-		$email_body    = ParseEmail::add_course_info( $post_ID, $email_body );
-		$email_body    = apply_filters( 'the_content', $email_body ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+	public static function parse_info($post_ID, $email_subject, $email_body)
+	{
+		$email_subject = ParseEmail::add_course_info($post_ID, $email_subject);
+		$email_body    = ParseEmail::add_course_info($post_ID, $email_body);
+		$email_body    = apply_filters('the_content', $email_body); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		return [
 			'subject' => $email_subject,
 			'body'    => $email_body,
 		];
 	}
 
-	public static function get_content_for_users( $users, $post_ID, $subject, $body ) {
-		$email = self::get_email_subject_and_body( $post_ID, $subject, $body );
-
-		self::parse_emails_for_users( $users, $email['subject'], $email['body'] );
+	public static function get_content_for_users($users, $post_ID, $subject, $body)
+	{
+		$email = self::get_email_subject_and_body($post_ID, $subject, $body);
+		
+		if (!$email) {
+			return false;
+		}
+		self::parse_emails_for_users($users, $email['subject'], $email['body']);
 	}
 
-	public static function get_content( $post_ID, $subject, $body, $user_role = 'national_manager' ) {
-		Editors::$option_name = 'lasntg_subscriptions_training_officers';
-		$email         = self::get_email_subject_and_body( $post_ID, $subject, $body );
+	public static function get_content($post_ID, $subject, $body, $user_role = 'national_manager')
+	{
+
+		$email         = self::get_email_subject_and_body($post_ID, $subject, $body);
+		if (!$email) {
+			return false;
+		}
 		$email_subject = $email['subject'];
 		$email_body    = $email['body'];
-		$users         = self::get_users_in_group( $post_ID, $user_role );
-		self::parse_emails_for_users( $users, $email_subject, $email_body );
+		$users         = self::get_users_in_group($post_ID, $user_role);
+		error_log("Users: ". json_encode($users));
+		self::parse_emails_for_users($users, $email_subject, $email_body);
 	}
-	public static function parse_emails_for_users( $users, $subject, $body ) {
-		foreach ( $users as $user ) {
-			$unique_body    = ParseEmail::add_receiver_info( $user, $body );
-			$unique_subject = ParseEmail::add_receiver_info( $user, $subject );
-			self::send_mail( $user->user_email, $unique_subject, $unique_body );
+	public static function parse_emails_for_users($users, $subject, $body)
+	{
+		foreach ($users as $user) {
+			$unique_body    = ParseEmail::add_receiver_info($user, $body);
+			$unique_subject = ParseEmail::add_receiver_info($user, $subject);
+			self::send_mail($user->user_email, $unique_subject, $unique_body);
 		}
 	}
 
-	protected static function send_mail( $email, $subject, $body ) {
-		$headers = array( 'Content-Type: text/html; charset=UTF-8' );
-		$sent    = wp_mail( $email, $subject, $body, $headers );
-		error_log( "Sent: $sent, $email" );
+	protected static function send_mail($email, $subject, $body)
+	{
+		$headers = array('Content-Type: text/html; charset=UTF-8');
+		$sent    = wp_mail($email, $subject, $body, $headers);
+		error_log("Sent: $sent, $email: $subject");
 	}
 }
