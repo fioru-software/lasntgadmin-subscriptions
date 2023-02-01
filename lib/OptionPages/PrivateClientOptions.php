@@ -2,33 +2,30 @@
 
 namespace Lasntg\Admin\Subscriptions\OptionPages;
 
-class GeneralOptions extends OptionPage {
-
+class PrivateClientOptions extends OptionPage {
+	protected static $option_name_ = 'lasntg_subscriptions_private';
+	protected static $tab_name     = 'private';
+	protected static $tab_settings = 'private_settings';
 	public static function init(): void {
-		parent::$tab_name = 'general';
-
+		parent::$tab_name    = static::$tab_name;
+		static::$option_name = self::$option_name_;
 		parent::init();
-		parent::$option_name = 'lasntg_subscriptions_general';
-		if ( is_admin() && static::$active_tab == static::$tab_name ) {
-			self::$option_name    = 'lasntg_subscriptions_general';
-			Editors::$option_name = 'lasntg_subscriptions_general';
-			add_action( 'admin_init', [ static::class, 'page_init' ] );
-		}
 	}
 
 	public static function page_init(): void {
-		self::$option_name = 'lasntg_subscriptions_general';
-
+		self::$option_name    = 'lasntg_subscriptions_private';
+		parent::$option_name  = self::$option_name_;
+		Editors::$option_name = static::$option_name;
 		add_settings_section(
-			'general_settings',
+			'private_settings',
 			'',
 			[ static::class, 'section_info' ],
 			self::$option_name
 		);
 
 		$fields = [
-			'cancel_waiting_order_subject'    => __( 'Waiting Order Cancelled(Order Creator) Subject', 'lasntgadmin' ),
-			'cancel_waiting_order'            => __( 'Waiting Order Cancelled(Order Creator) Body', 'lasntgadmin' ),
+			'course_cancellation_subject'     => __( 'Course Cancelled Subject', 'lasntgadmin' ),
+			'course_cancellation'             => __( 'Course Cancelled Body', 'lasntgadmin' ),
 
 			'status_set_to_enrolling_subject' => __( 'Vacant space available Subject', 'lasntgadmin' ),
 			'status_set_to_enrolling'         => __( 'Vacant space available', 'lasntgadmin' ),
@@ -38,7 +35,7 @@ class GeneralOptions extends OptionPage {
 			Editors::add_settings_field(
 				$subject,
 				$field,
-				'general_settings'
+				'private_settings'
 			);
 		}
 	}
@@ -47,7 +44,7 @@ class GeneralOptions extends OptionPage {
 	public static function section_info() {
 		?>
 		<p>
-			<?php echo __( 'General Messages...', 'lasntgadmin' ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			<?php echo __( 'Private Messages...', 'lasntgadmin' ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		</p>
 		<?php
 		parent::show_key();
@@ -55,12 +52,12 @@ class GeneralOptions extends OptionPage {
 
 	public static function sanitize( $input ): array {
 		$editor_fields = [
-			'cancel_waiting_order',
+			'course_cancellation',
 			'status_set_to_enrolling',
 		];
 
 		$text_fields = [
-			'cancel_waiting_order_subject',
+			'course_cancellation_subject',
 			'status_set_to_enrolling_subject',
 		];
 		return parent::sanitize_fieds( $input, $editor_fields, $text_fields );
