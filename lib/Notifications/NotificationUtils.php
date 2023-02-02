@@ -69,7 +69,7 @@ class NotificationUtils {
 		$user_role = "%$role%";
 		$args      = implode( ',', array_fill( 0, count( $order_status ), '%s' ) );
 		/**
-		 * had to join users since woocommerce posts always have the post_ author as 1
+		 * Had to join users since woocommerce posts always have the post_ author as 1.
 		 */
 		$results = $wpdb->get_results(
 			$wpdb->prepare(
