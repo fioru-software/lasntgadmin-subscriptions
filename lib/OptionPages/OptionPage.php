@@ -178,11 +178,7 @@ class OptionPage {
 			</h2>
 
 			<h2 class="nav-tab-wrapper">
-				<a href="?page=lasntg-subscriptions&tab=private" class="nav-tab <?php echo 'private' === static::$active_tab ? 'nav-tab-active' : ''; ?>">
-					<?php
-					echo __( 'Private Client', 'lasntgadmin' ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 
-					?>
-				</a>
+				
 				<a href="?page=lasntg-subscriptions&tab=national_manager" class="nav-tab <?php echo 'national_manager' === static::$active_tab ? 'nav-tab-active' : ''; ?>">
 					<?php
 					echo __( 'National Manager', 'lasntgadmin' ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 
@@ -196,6 +192,11 @@ class OptionPage {
 				<a href="?page=lasntg-subscriptions&tab=training_officers" class="nav-tab <?php echo 'training_officers' === static::$active_tab ? 'nav-tab-active' : ''; ?>">
 					<?php
 					echo __( 'Training Officers', 'lasntgadmin' ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 
+					?>
+				</a>
+				<a href="?page=lasntg-subscriptions&tab=private" class="nav-tab <?php echo 'private' === static::$active_tab ? 'nav-tab-active' : ''; ?>">
+					<?php
+					echo __( 'Private Client', 'lasntgadmin' ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 
 					?>
 				</a>
 				<a href="?page=lasntg-subscriptions&tab=advanced" class="nav-tab <?php echo 'advanced' === static::$active_tab ? 'nav-tab-active' : ''; ?>">
