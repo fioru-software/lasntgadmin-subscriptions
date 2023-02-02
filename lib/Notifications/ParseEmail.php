@@ -1,5 +1,5 @@
 <?php
-namespace Lasntg\Admin\Subscriptions;
+namespace Lasntg\Admin\Subscriptions\Notifications;
 
 use Lasntg\Admin\Products\ProductUtils;
 class ParseEmail {
@@ -10,6 +10,7 @@ class ParseEmail {
 			'name'                     => $product->get_title(),
 			'cost'                     => $product->get_price(),
 			'capacity'                 => $product->get_stock_quantity(),
+			'description'              => $product->get_description(),
 			'status'                   => ProductUtils::get_status_name( $product->get_status() ),
 			'event_type'               => get_field( 'field_6387864196776', $post_ID, true ),
 			'awarding_body'            => get_field( 'field_638786be96777', $post_ID, true ),
