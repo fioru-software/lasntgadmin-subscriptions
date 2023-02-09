@@ -29,4 +29,7 @@ abstract class BaseNotification {
 		static::set_option_name();
 		NotificationUtils::get_content( $post_ID, 'course_cancellation_subject', 'course_cancellation', static::$user_role );
 	}
+
+	public static function open_for_enrollment( $post_ID ) {
+	}
 }

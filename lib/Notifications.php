@@ -4,6 +4,7 @@ namespace Lasntg\Admin\Subscriptions;
 
 use Lasntg\Admin\Subscriptions\Notifications\ManagersNotifications;
 use Lasntg\Admin\Subscriptions\Notifications\NotificationUtils;
+use Lasntg\Admin\Subscriptions\Notifications\PrivateNotifications;
 use Lasntg\Admin\Subscriptions\Notifications\RegionalManagerNotifications;
 use Lasntg\Admin\Subscriptions\Notifications\TrainingCenterNotifications;
 
@@ -41,7 +42,8 @@ class Notifications {
 		ManagersNotifications::status_changed( $post_ID );
 		RegionalManagerNotifications::status_changed( $post_ID );
 	}
-	public static function open_for_enrollment( $post_id ) {
+	public static function open_for_enrollment( $post_ID ) {
+		PrivateNotifications::open_for_enrollment( $post_ID );
 	}
 
 	public static function new_course( $post_ID ) {

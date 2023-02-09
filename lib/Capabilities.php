@@ -32,7 +32,9 @@ class Capabilities {
 	 * Training officer capabilities
 	 */
 	public static function get_training_officer_capabilities(): array {
-		return [];
+		return [
+			'lasntg_list_options',
+		];
 	}
 
 	/**

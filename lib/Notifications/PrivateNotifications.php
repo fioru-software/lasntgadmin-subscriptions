@@ -9,4 +9,7 @@ class PrivateNotifications extends BaseNotification {
 	public static function course_cancellation( $post_ID ) {
 		self::set_option_name();
 	}
+
+	public static function open_for_enrollment( $post_ID ) {
+	}
 }

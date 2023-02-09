@@ -3,9 +3,9 @@
 namespace Lasntg\Admin\Subscriptions\Notifications;
 
 use Lasntg\Admin\Subscriptions\OptionPages\Editors;
+use Lasntg\Admin\Subscriptions\SubscriptionManager;
 
 class NotificationUtils {
-
 
 
 	/**
@@ -14,19 +14,68 @@ class NotificationUtils {
 	public static function get_post_group_ids( $post_ID ) {
 		return \Groups_Post_Access::get_read_group_ids( $post_ID );
 	}
+
+	/**
+	 * @todo replace with QuotaUtils
+	 */
+	public static function get_group_quotas( $post_ID, $group_id ) {
+		$value = get_post_meta( $post_ID, '_quotas_field_' . $group_id, true );
+		if ( is_numeric( $value ) ) {
+			return (int) $value;
+		}
+		return $value;
+	}
+
+	public static function check_subscription( $post_ID, $users ) {
+		if ( ! $users ) {
+			return $users;
+		}
+		/**
+		 * Check categories
+		 * Check location
+		 * Check course type
+		 */
+		// $post = get_post($post_ID);
+		$product = new \WC_Product( $post_ID );
+		$cat_ids = $product->get_category_ids();
+
+		$course_type = get_field( 'field_6387864196776', $post_ID );
+		$location    = get_field( 'field_63881b84798a5', $post_ID );
+		if ( $cat_ids ) {
+			$cat_id = $cat_ids[0];
+			foreach ( $users as $key => $user ) {
+				$in_mailing = SubscriptionManager::confirm_meta( $user->ID, $cat_id );
+				if ( $in_mailing ) {
+					continue;
+				}
+				$in_location = SubscriptionManager::confirm_meta( $user->ID, $location, 'location' );
+				if ( $in_location ) {
+					continue;
+				}
+				$in_course = SubscriptionManager::confirm_meta( $user->ID, $course_type, 'course_type' );
+				if ( $in_course ) {
+					continue;
+				}
+				unset( $users[ $key ] );
+			}
+		}
+		return $users;
+	}
+
 	public static function get_users_in_group( $post_ID, $role = 'national_manager' ) {
 		global $wpdb;
 
 		$user_role = "%$role%";
 		$group_ids = self::get_post_group_ids( $post_ID );
 		$users     = [];
+
 		// check quotas for training officer.
 		// remove groups with zero quotas.
 		if ( 'training_officer' === $role ) {
 			foreach ( $group_ids as $key => $group_id ) {
-				$value = get_post_meta( $post_ID, '_quotas_field_' . $group_id, true );
+				$value = self::get_group_quotas( $post_ID, $group_id );
 
-				if ( is_numeric( $value ) && 0 === (int) $value ) {
+				if ( 0 === $value ) {
 					unset( $group_ids[ $key ] );
 				}
 			}
@@ -60,6 +109,8 @@ class NotificationUtils {
 				}
 				$user_ids[] = $user->ID;
 			}
+
+			$results = self::check_subscription( $post_ID, $results );
 		}
 		return $results;
 	}

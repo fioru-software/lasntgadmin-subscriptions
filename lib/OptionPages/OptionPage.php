@@ -223,6 +223,7 @@ class OptionPage {
 					Course Name: {%name%}<br />
 					Course Cost: {%cost%}<br />
 					Course Description: {%description%}<br />
+					Course Link: {%link%}<br />
 					Course Capacity: {%capacity%}<br />
 					Course Status: {%status%}<br />
 					Course Event Type: {%event_type%}<br />
