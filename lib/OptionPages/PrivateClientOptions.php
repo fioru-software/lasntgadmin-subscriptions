@@ -6,12 +6,23 @@ class PrivateClientOptions extends OptionPage {
 	protected static $option_name_ = 'lasntg_subscriptions_private';
 	protected static $tab_name     = 'private';
 	protected static $tab_settings = 'private_settings';
+
+	/**
+	 * Init.
+	 *
+	 * @return void
+	 */
 	public static function init(): void {
 		parent::$tab_name    = static::$tab_name;
 		static::$option_name = self::$option_name_;
 		parent::init();
 	}
 
+	/**
+	 * Page Init.
+	 *
+	 * @return void
+	 */
 	public static function page_init(): void {
 		self::$option_name    = 'lasntg_subscriptions_private';
 		parent::$option_name  = self::$option_name_;
@@ -40,8 +51,12 @@ class PrivateClientOptions extends OptionPage {
 		}
 	}
 
-
-	public static function section_info() {
+	/**
+	 * Section Info.
+	 *
+	 * @return void
+	 */
+	public static function section_info(): void {
 		?>
 		<p>
 			<?php echo __( 'Private Messages...', 'lasntgadmin' ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
@@ -50,6 +65,12 @@ class PrivateClientOptions extends OptionPage {
 		parent::show_key();
 	}
 
+	/**
+	 * Sanitize.
+	 *
+	 * @param  mixed $input Input.
+	 * @return array
+	 */
 	public static function sanitize( $input ): array {
 		$editor_fields = [
 			'course_cancellation',

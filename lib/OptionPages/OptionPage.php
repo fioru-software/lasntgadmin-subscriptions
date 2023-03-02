@@ -43,7 +43,7 @@ class OptionPage {
 
 		return self::sanitize_fieds( $input, $editor_fields, $text_fields );
 	}
-	public static function sanitize_fieds( $input, $editor_fields, $text_fields = [] ) {
+	public static function sanitize_fieds( $input, $editor_fields, $text_fields = [] ): array {
 		// Fix for issue that options are sanitized twice when no db entry exists
 		// "It seems the data is passed through the sanitize function twice.[...]
 		// This should only happen when the option is not yet in the wp_options table."
@@ -69,7 +69,7 @@ class OptionPage {
 		return static::$option_name;
 	}
 
-	public static function load_page_content() {            ?>
+	public static function load_page_content(): void {            ?>
 		<form method="post" action="options.php">
 			<?php
 			settings_fields( static::$option_name );
@@ -79,7 +79,7 @@ class OptionPage {
 		</form>
 		<?php
 	}
-	public static function init() {
+	public static function init(): void {
 		static::$active_tab = isset( $_GET['tab'] ) ?
 			sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : 'national_manager';
 		if ( ! self::$initiated ) {
@@ -92,7 +92,7 @@ class OptionPage {
 			add_action( 'admin_init', [ static::class, 'page_init' ] );
 		}
 	}
-	public static function section_info() {
+	public static function section_info(): void {
 		?>
 		<p>
 			<?php
@@ -110,7 +110,7 @@ class OptionPage {
 			static::$option_name
 		);
 	}
-	public static function set_fields() {
+	public static function set_fields(): void {
 		$fields = [
 			'course_new_subject'          => __( 'New Course Subject', 'lasntgadmin' ),
 			'course_new'                  => __( 'New Course Body', 'lasntgadmin' ),
@@ -133,7 +133,7 @@ class OptionPage {
 			);
 		}
 	}
-	protected static function register_setting() {
+	protected static function register_setting(): void {
 		$settings = [
 			'lasntg_subscriptions_private'           => PrivateClientOptions::class,
 			'lasntg_subscriptions_options'           => NationalManagerOptions::class,
@@ -153,7 +153,7 @@ class OptionPage {
 	/**
 	 * Adds plugin settings page to admin
 	 */
-	public static function add_plugin_page() {
+	public static function add_plugin_page(): void {
 		add_options_page(
 			__( 'Lasntg Subscriptions', 'lasntgadmin' ),
 			__( 'Lasntg Subscriptions', 'lasntgadmin' ),
@@ -168,7 +168,7 @@ class OptionPage {
 	 * Creates header of admin settings page
 	 * Expects loadPageContent() to exist in child class
 	 */
-	public static function create_admin_page() {
+	public static function create_admin_page(): void {
 		?>
 		<div class="wrap">
 			<h2>
@@ -211,7 +211,12 @@ class OptionPage {
 		<?php
 	}
 
-	public static function show_key() {
+	/**
+	 * Show Table Key.
+	 *
+	 * @return void
+	 */
+	public static function show_key(): void {
 		?>
 
 		<div class="" style="display: flex">

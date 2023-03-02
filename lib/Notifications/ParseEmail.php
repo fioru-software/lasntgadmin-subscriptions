@@ -3,6 +3,13 @@ namespace Lasntg\Admin\Subscriptions\Notifications;
 
 use Lasntg\Admin\Products\ProductUtils;
 class ParseEmail {
+	/**
+	 * Add course info.
+	 *
+	 * @param  int    $post_ID Post ID.
+	 * @param  string $message Message to replace with placeholders.
+	 * @return string
+	 */
 	public static function add_course_info( $post_ID, $message ) {
 		$product       = new \WC_Product( $post_ID );
 		$course_fields = [
@@ -38,7 +45,14 @@ class ParseEmail {
 		return self::replace( $message, $course_fields );
 	}
 
-	private static function replace( $message, $fields ) {
+	/**
+	 * Replace placeholder with value.
+	 *
+	 * @param  string $message Message.
+	 * @param  array  $fields Fields.
+	 * @return string
+	 */
+	private static function replace( $message, array $fields ) {
 		foreach ( $fields as $name => $value ) {
 			$message = str_replace( "{%$name%}", $value, $message );
 			$message = str_replace( "{% $name %}", $value, $message );
@@ -48,6 +62,13 @@ class ParseEmail {
 		return $message;
 	}
 
+	/**
+	 * Add Receiver info to the message
+	 *
+	 * @param  mixed  $user WP_User.
+	 * @param  string $message Message.
+	 * @return string
+	 */
 	public static function add_receiver_info( $user, $message ) {
 		$customer = new \WC_Customer( $user->ID );
 
