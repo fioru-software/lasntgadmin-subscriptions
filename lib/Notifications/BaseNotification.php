@@ -61,4 +61,9 @@ abstract class BaseNotification {
 
 	public static function open_for_enrollment( $post_ID ) {
 	}
+
+	public static function custom_canellation_with_message( $post_ID, $subject, $body ) {
+		$users = NotificationUtils::get_users_in_group( $post_ID, self::$user_role );
+		NotificationUtils::parse_emails_for_users( $users, $subject, $body );
+	}
 }

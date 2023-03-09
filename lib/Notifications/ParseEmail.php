@@ -45,6 +45,9 @@ class ParseEmail {
 		return self::replace( $message, $course_fields );
 	}
 
+	public static function set_quoatas() {
+		global $wpdb;
+	}
 	/**
 	 * Replace placeholder with value.
 	 *
