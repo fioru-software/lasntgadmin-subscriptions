@@ -3,6 +3,13 @@ namespace Lasntg\Admin\Subscriptions\Notifications;
 
 use Lasntg\Admin\Products\ProductUtils;
 class ParseEmail {
+	/**
+	 * Add course info.
+	 *
+	 * @param  int    $post_ID Post ID.
+	 * @param  string $message Message to replace with placeholders.
+	 * @return string
+	 */
 	public static function add_course_info( $post_ID, $message ) {
 		$product       = new \WC_Product( $post_ID );
 		$course_fields = [
@@ -11,6 +18,7 @@ class ParseEmail {
 			'cost'                     => $product->get_price(),
 			'capacity'                 => $product->get_stock_quantity(),
 			'description'              => $product->get_description(),
+			'link'                     => $product->get_permalink(),
 			'status'                   => ProductUtils::get_status_name( $product->get_status() ),
 			'event_type'               => get_field( 'field_6387864196776', $post_ID, true ),
 			'awarding_body'            => get_field( 'field_638786be96777', $post_ID, true ),
@@ -37,7 +45,17 @@ class ParseEmail {
 		return self::replace( $message, $course_fields );
 	}
 
-	private static function replace( $message, $fields ) {
+	public static function set_quoatas() {
+		global $wpdb;
+	}
+	/**
+	 * Replace placeholder with value.
+	 *
+	 * @param  string $message Message.
+	 * @param  array  $fields Fields.
+	 * @return string
+	 */
+	private static function replace( $message, array $fields ) {
 		foreach ( $fields as $name => $value ) {
 			$message = str_replace( "{%$name%}", $value, $message );
 			$message = str_replace( "{% $name %}", $value, $message );
@@ -47,6 +65,13 @@ class ParseEmail {
 		return $message;
 	}
 
+	/**
+	 * Add Receiver info to the message
+	 *
+	 * @param  mixed  $user WP_User.
+	 * @param  string $message Message.
+	 * @return string
+	 */
 	public static function add_receiver_info( $user, $message ) {
 		$customer = new \WC_Customer( $user->ID );
 

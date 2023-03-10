@@ -18,7 +18,7 @@
             const parent_div = $('#open-custom-cancellation-msg-div');
             console.log('post_status', post_status.val())
             if (post_status.val() === 'cancelled') {
-                parent_div.show()
+                parent_div.show();
             } else {
                 parent_div.hide();
             }
@@ -27,7 +27,6 @@
         $('.save-post-status').on('click', function () {
             show_hide_parent();
         })
-
 
         $("#open-custom-cancellation-msg").click(function () {
             setTimeout(function () {

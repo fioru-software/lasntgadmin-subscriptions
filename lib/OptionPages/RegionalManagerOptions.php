@@ -8,7 +8,7 @@ class RegionalManagerOptions extends OptionPage {
 	protected static $tab_name     = 'regional_manager';
 	protected static $tab_settings = 'regional_settings';
 
-	public static function init() {
+	public static function init(): void {
 		parent::$tab_name    = static::$tab_name;
 		static::$option_name = self::$option_name_;
 		parent::init();
@@ -27,7 +27,8 @@ class RegionalManagerOptions extends OptionPage {
 
 		self::set_fields();
 	}
-	public static function section_info() {
+
+	public static function section_info(): void {
 		?>
 		<p>
 			<?php

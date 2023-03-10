@@ -10,7 +10,7 @@ class CustomMessages {
 		add_action( 'wp_ajax_nopriv_lasntgadmin_custom_cancel_message', [ self::class, 'save_message' ] );
 	}
 
-	public static function modal() {
+	public static function modal(): void {
 		global $post;
 		$post_type = property_exists( get_current_screen(), 'post_type' ) ? get_current_screen()->post_type : false;
 		if ( 'product' !== $post_type ) {
@@ -33,7 +33,7 @@ class CustomMessages {
 		</div>
 		<?php
 	}
-	public static function add_cancel_custom_message() {
+	public static function add_cancel_custom_message(): void {
 		global $post;
 		$post_type = property_exists( get_current_screen(), 'post_type' ) ? get_current_screen()->post_type : false;
 		if ( 'product' !== $post_type ) {
@@ -62,7 +62,7 @@ class CustomMessages {
 		<?php
 	}
 
-	public static function save_message() {
+	public static function save_message(): void {
 		check_ajax_referer( 'lasntgadmin-custom-cancel-message-nonce', 'security' );
 		if (
 			! isset( $_POST['product_id'] )

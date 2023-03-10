@@ -8,7 +8,7 @@ class TrainingOfficersOptions extends OptionPage {
 	protected static $tab_name     = 'training_officers';
 	protected static $tab_settings = 'training_officer_settings';
 
-	public static function init() {
+	public static function init(): void {
 		parent::$tab_name    = static::$tab_name;
 		static::$option_name = self::$option_name_;
 		parent::init();
@@ -26,7 +26,7 @@ class TrainingOfficersOptions extends OptionPage {
 
 		self::set_fields();
 	}
-	public static function section_info() {
+	public static function section_info(): void {
 		?>
 		<p>
 			<?php

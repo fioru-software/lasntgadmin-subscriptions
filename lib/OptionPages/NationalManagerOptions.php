@@ -8,12 +8,22 @@ class NationalManagerOptions extends OptionPage {
 	protected static $tab_name     = 'national_manager';
 	protected static $tab_settings = 'message_settings';
 
-	public static function init() {
+	/**
+	 * Init.
+	 *
+	 * @return void
+	 */
+	public static function init(): void {
 		parent::$tab_name    = static::$tab_name;
 		static::$option_name = self::$option_name_;
 		parent::init();
 	}
 
+	/**
+	 * Page Init.
+	 *
+	 * @return void
+	 */
 	public static function page_init(): void {
 		parent::$option_name  = self::$option_name_;
 		Editors::$option_name = static::$option_name;
@@ -26,7 +36,12 @@ class NationalManagerOptions extends OptionPage {
 
 		self::set_fields();
 	}
-	public static function section_info() {
+	/**
+	 * Section Info.
+	 *
+	 * @return void
+	 */
+	public static function section_info(): void {
 		?>
 		<p>
 			<?php

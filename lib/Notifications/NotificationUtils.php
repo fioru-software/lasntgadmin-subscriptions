@@ -3,30 +3,85 @@
 namespace Lasntg\Admin\Subscriptions\Notifications;
 
 use Lasntg\Admin\Subscriptions\OptionPages\Editors;
+use Lasntg\Admin\Subscriptions\SubscriptionPages\SubscriptionManager;
 
 class NotificationUtils {
-
-
-
+	public static $location_acf = 'field_63881b84798a5';
+	public static $course_acf   = 'field_6387864196776';
 	/**
 	 * Should be placed in groups plugin.
 	 */
 	public static function get_post_group_ids( $post_ID ) {
 		return \Groups_Post_Access::get_read_group_ids( $post_ID );
 	}
+
+	/**
+	 * @todo replace with QuotaUtils
+	 */
+	public static function get_group_quotas( $post_ID, $group_id ) {
+		$value = get_post_meta( $post_ID, '_quotas_field_' . $group_id, true );
+		if ( is_numeric( $value ) ) {
+			return (int) $value;
+		}
+		return $value;
+	}
+
+	public static function check_subscription( $post_ID, $users ) {
+		if ( ! $users ) {
+			return $users;
+		}
+		/**
+		 * Check categories.
+		 * Check location.
+		 * Check course type.
+		 */
+		$product = new \WC_Product( $post_ID );
+		$cat_ids = $product->get_category_ids();
+
+		$course_type = get_field( self::$course_acf, $post_ID );
+		$location    = get_field( self::$location_acf, $post_ID );
+
+		$cat_id = $cat_ids[0];
+		foreach ( $users as $key => $user ) {
+			// check if user has any checked options.
+			// Category.
+			$in_mailing_category = SubscriptionManager::confirm_meta( $user->ID, $cat_id );
+			// Location.
+			$in_location = SubscriptionManager::confirm_meta( $user->ID, $location, 'location' );
+
+			// Course Type.
+			$in_course = SubscriptionManager::confirm_meta( $user->ID, $course_type, 'course_type' );
+
+			if ( ! $in_mailing_category || ! $in_location || ! $in_course ) {
+				// unset user from $users since they do not have any of the required options.
+				unset( $users[ $key ] );
+			}
+		}
+
+		return $users;
+	}
+
+	/**
+	 * Get Users in group.
+	 *
+	 * @param  int    $post_ID Post ID.
+	 * @param  string $role User Role.
+	 * @return array
+	 */
 	public static function get_users_in_group( $post_ID, $role = 'national_manager' ) {
 		global $wpdb;
 
 		$user_role = "%$role%";
 		$group_ids = self::get_post_group_ids( $post_ID );
 		$users     = [];
+
 		// check quotas for training officer.
 		// remove groups with zero quotas.
 		if ( 'training_officer' === $role ) {
 			foreach ( $group_ids as $key => $group_id ) {
-				$value = get_post_meta( $post_ID, '_quotas_field_' . $group_id, true );
+				$value = self::get_group_quotas( $post_ID, $group_id );
 
-				if ( is_numeric( $value ) && 0 === (int) $value ) {
+				if ( 0 === $value ) {
 					unset( $group_ids[ $key ] );
 				}
 			}
@@ -51,6 +106,8 @@ class NotificationUtils {
 		$results = $wpdb->get_results( $wpdb->prepare( $query, $params ) ); //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		// get unique users rather than duplicates.
 		if ( 'training_officer' === $role ) {
+			// make sure that users with orders do see notifications even if they unsubscribed.
+			$results  = self::check_subscription( $post_ID, $results );
 			$results  = array_merge( $users, $results );
 			$user_ids = [];
 			foreach ( $results as $key => $user ) {
@@ -64,6 +121,14 @@ class NotificationUtils {
 		return $results;
 	}
 
+	/**
+	 * Get Users by Product Order and also by role.
+	 *
+	 * @param  int    $product_id Product ID.
+	 * @param  string $role User Role.
+	 * @param  array  $order_status default array( 'wc-cancelled', 'wc-processing', 'wc-completed' ).
+	 * @return array
+	 */
 	public static function get_users_by_product_orders_by_role( $product_id, $role = 'training_officer', $order_status = array( 'wc-cancelled', 'wc-processing', 'wc-completed' ) ) {
 		global $wpdb;
 		$user_role = "%$role%";
@@ -97,6 +162,7 @@ class NotificationUtils {
 
 		return $results;
 	}
+
 	/**
 	 * Get All orders IDs for a given product ID.
 	 *
@@ -128,9 +194,18 @@ class NotificationUtils {
 				array_merge( $order_status, [ $product_id ] )
 			)
 		);
+
 		return $results;
 	}
 
+	/**
+	 * Get's email subject and body and is also parsed.
+	 *
+	 * @param  int    $post_ID Post ID.
+	 * @param  string $subject Subject.
+	 * @param  string $body Body.
+	 * @return bool|array returns false or an array.
+	 */
 	protected static function get_email_subject_and_body( $post_ID, $subject, $body ) {
 		$email_subject = Editors::get_options( $subject );
 		$email_body    = Editors::get_options( $body );
@@ -140,7 +215,15 @@ class NotificationUtils {
 		return self::parse_info( $post_ID, $email_subject, $email_body );
 	}
 
-	public static function parse_info( $post_ID, $email_subject, $email_body ) {
+	/**
+	 * Parse info.
+	 *
+	 * @param  int    $post_ID Post ID.
+	 * @param  string $email_subject Subject.
+	 * @param  string $email_body Body.
+	 * @return array
+	 */
+	public static function parse_info( $post_ID, $email_subject, $email_body ): array {
 		$email_subject = ParseEmail::add_course_info( $post_ID, $email_subject );
 		$email_body    = ParseEmail::add_course_info( $post_ID, $email_body );
 		$email_body    = apply_filters( 'the_content', $email_body ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
@@ -150,16 +233,35 @@ class NotificationUtils {
 		];
 	}
 
-	public static function get_content_for_users( $users, $post_ID, $subject, $body ) {
+	/**
+	 * Get Content for users.
+	 *
+	 * @param  array  $users Users.
+	 * @param  int    $post_ID Post ID.
+	 * @param  string $subject Subject.
+	 * @param  string $body Body.
+	 * @return bool
+	 */
+	public static function get_content_for_users( $users, $post_ID, $subject, $body ): bool {
 		$email = self::get_email_subject_and_body( $post_ID, $subject, $body );
 
 		if ( ! $email ) {
 			return false;
 		}
 		self::parse_emails_for_users( $users, $email['subject'], $email['body'] );
+		return true;
 	}
 
-	public static function get_content( $post_ID, $subject, $body, $user_role = 'national_manager' ) {
+	/**
+	 * Get Content.
+	 *
+	 * @param  int    $post_ID Post ID.
+	 * @param  string $subject Subject.
+	 * @param  string $body Body.
+	 * @param  string $user_role User Role.
+	 * @return bool True|False.
+	 */
+	public static function get_content( $post_ID, $subject, $body, $user_role = 'national_manager' ): bool {
 		$email = self::get_email_subject_and_body( $post_ID, $subject, $body );
 		if ( ! $email ) {
 			return false;
@@ -167,10 +269,18 @@ class NotificationUtils {
 		$email_subject = $email['subject'];
 		$email_body    = $email['body'];
 		$users         = self::get_users_in_group( $post_ID, $user_role );
-		error_log( 'Users: ' . json_encode( $users ) );
 		self::parse_emails_for_users( $users, $email_subject, $email_body );
+		return true;
 	}
-	public static function parse_emails_for_users( $users, $subject, $body ) {
+	/**
+	 * Parse Emails for users.
+	 *
+	 * @param  array  $users Users.
+	 * @param  string $subject Subject.
+	 * @param  string $body Body.
+	 * @return void
+	 */
+	public static function parse_emails_for_users( $users, $subject, $body ): void {
 		foreach ( $users as $user ) {
 			$unique_body    = ParseEmail::add_receiver_info( $user, $body );
 			$unique_subject = ParseEmail::add_receiver_info( $user, $subject );
@@ -178,9 +288,16 @@ class NotificationUtils {
 		}
 	}
 
-	protected static function send_mail( $email, $subject, $body ) {
+	/**
+	 * Send Mail.
+	 *
+	 * @param  string $email User email address.
+	 * @param  string $subject Subject.
+	 * @param  string $body Body.
+	 * @return bool
+	 */
+	protected static function send_mail( $email, $subject, $body ): bool {
 		$headers = array( 'Content-Type: text/html; charset=UTF-8' );
-		$sent    = wp_mail( $email, $subject, $body, $headers );
-		error_log( "Sent: $sent, $email: $subject" );
+		return wp_mail( $email, $subject, $body, $headers );
 	}
 }
