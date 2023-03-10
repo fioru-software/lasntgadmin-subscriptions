@@ -46,21 +46,16 @@ class NotificationUtils {
 			// check if user has any checked options.
 			// Category.
 			$in_mailing_category = SubscriptionManager::confirm_meta( $user->ID, $cat_id );
-			if ( $in_mailing_category ) {
-				continue;
-			}
 			// Location.
 			$in_location = SubscriptionManager::confirm_meta( $user->ID, $location, 'location' );
-			if ( $in_location ) {
-				continue;
-			}
+
 			// Course Type.
 			$in_course = SubscriptionManager::confirm_meta( $user->ID, $course_type, 'course_type' );
-			if ( $in_course ) {
-				continue;
+
+			if ( ! $in_mailing_category || ! $in_location || ! $in_course ) {
+				// unset user from $users since they do not have any of the required options.
+				unset( $users[ $key ] );
 			}
-			// unset user from $users since they do not have any of the required options.
-			unset( $users[ $key ] );
 		}
 
 		return $users;
