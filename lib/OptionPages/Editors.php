@@ -40,6 +40,14 @@ class Editors {
 	}
 
 	/**
+	 * Course Open for Enrollment Subject Field.
+	 *
+	 * @return void
+	 */
+	public static function course_open_for_enrollment_subject(): void {
+		self::add_text_field( 'course_open_for_enrollment_subject' );
+	}
+	/**
 	 * Course New Subject Field.
 	 *
 	 * @return void
@@ -164,6 +172,14 @@ class Editors {
 	 */
 	public static function course_creation(): void {
 		self::wp_editor( 'course_creation' );
+	}
+	/**
+	 * Course Creation WP_Editor.
+	 *
+	 * @return void
+	 */
+	public static function course_open_for_enrollment(): void {
+		self::wp_editor( 'course_open_for_enrollment' );
 	}
 
 	/**
