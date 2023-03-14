@@ -82,7 +82,12 @@ class SubscriptionActionsFilters {
 			if ( 'cancelled' === $post_after->post_status ) {
 				Notifications::course_cancelled( $post_ID );
 				return $post_ID;
-			} else {
+			} 
+			elseif ( 'open_for_enrollment' === $post_after->post_status ) {
+				Notifications::open_for_enrollment( $post_ID );
+				return $post_ID;
+			} 
+			else {
 				Notifications::course_status_change( $post_ID, $post_after->post_status, $post_before->post_status );
 				return $post_ID;
 			}

@@ -77,7 +77,10 @@ class NotificationUtils {
 
 		// check quotas for training officer.
 		// remove groups with zero quotas.
-		if ( 'training_officer' === $role ) {
+		if ( 
+		'training_officer' === $role ||
+		'customer' == $role
+		 ) {
 			foreach ( $group_ids as $key => $group_id ) {
 				$value = self::get_group_quotas( $post_ID, $group_id );
 
@@ -105,8 +108,10 @@ class NotificationUtils {
 
 		$results = $wpdb->get_results( $wpdb->prepare( $query, $params ) ); //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		// get unique users rather than duplicates.
-		if ( 'training_officer' === $role ) {
-			// make sure that users with orders do see notifications even if they unsubscribed.
+		if ( 
+		'training_officer' === $role ||
+		'customer' == $role) {
+			// make sure that users with orders do see notifications even if though unsubscribed.
 			$results  = self::check_subscription( $post_ID, $results );
 			$results  = array_merge( $users, $results );
 			$user_ids = [];
@@ -263,12 +268,14 @@ class NotificationUtils {
 	 */
 	public static function get_content( $post_ID, $subject, $body, $user_role = 'national_manager' ): bool {
 		$email = self::get_email_subject_and_body( $post_ID, $subject, $body );
+		
 		if ( ! $email ) {
 			return false;
 		}
 		$email_subject = $email['subject'];
 		$email_body    = $email['body'];
 		$users         = self::get_users_in_group( $post_ID, $user_role );
+		error_log("get_cOntent: ". $user_role . '  :' . count($users));
 		self::parse_emails_for_users( $users, $email_subject, $email_body );
 		return true;
 	}
@@ -298,6 +305,7 @@ class NotificationUtils {
 	 */
 	protected static function send_mail( $email, $subject, $body ): bool {
 		$headers = array( 'Content-Type: text/html; charset=UTF-8' );
+		error_log("SendMail: ". $email);
 		return wp_mail( $email, $subject, $body, $headers );
 	}
 }
