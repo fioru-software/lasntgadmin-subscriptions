@@ -61,12 +61,12 @@ abstract class BaseNotification {
 
 	public static function open_for_enrollment( $post_ID ) {
 		static::set_option_name();
-		error_log('Open for enrollment' . static::$option_name);
+		error_log( 'Open for enrollment' . static::$option_name );
 		NotificationUtils::get_content( $post_ID, 'course_open_for_enrollment_subject', 'course_open_for_enrollment', static::$user_role );
 	}
 
 	public static function custom_canellation_with_message( $post_ID, $subject, $body ) {
-		error_log('custom cancellation..'. static::$user_role);
+		error_log( 'custom cancellation..' . static::$user_role );
 		$users = NotificationUtils::get_users_in_group( $post_ID, static::$user_role );
 		NotificationUtils::parse_emails_for_users( $users, $subject, $body );
 	}

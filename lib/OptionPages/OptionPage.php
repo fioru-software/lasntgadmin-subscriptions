@@ -113,20 +113,20 @@ class OptionPage {
 	}
 	public static function set_fields(): void {
 		$fields = [
-			'course_open_for_enrollment_subject'          => __( 'Course Open For Enrollment Subject', 'lasntgadmin' ),
-			'course_open_for_enrollment'                  => __( 'Course Open For Enrollment', 'lasntgadmin' ),
-			
-			'course_new_subject'          => __( 'New Course Subject', 'lasntgadmin' ),
-			'course_new'                  => __( 'New Course Body', 'lasntgadmin' ),
+			'course_open_for_enrollment_subject' => __( 'Course Open For Enrollment Subject', 'lasntgadmin' ),
+			'course_open_for_enrollment'         => __( 'Course Open For Enrollment', 'lasntgadmin' ),
 
-			'course_update_subject'       => __( 'Course Update Subject', 'lasntgadmin' ),
-			'course_update'               => __( 'Course Update Body', 'lasntgadmin' ),
+			'course_new_subject'                 => __( 'New Course Subject', 'lasntgadmin' ),
+			'course_new'                         => __( 'New Course Body', 'lasntgadmin' ),
 
-			'status_change_subject'       => __( 'Course Status Change Subject', 'lasntgadmin' ),
-			'status_change'               => __( 'Course Status Change Body', 'lasntgadmin' ),
+			'course_update_subject'              => __( 'Course Update Subject', 'lasntgadmin' ),
+			'course_update'                      => __( 'Course Update Body', 'lasntgadmin' ),
 
-			'course_cancellation_subject' => __( 'Course Cancellation Subject', 'lasntgadmin' ),
-			'course_cancellation'         => __( 'Course Cancellation Body', 'lasntgadmin' ),
+			'status_change_subject'              => __( 'Course Status Change Subject', 'lasntgadmin' ),
+			'status_change'                      => __( 'Course Status Change Body', 'lasntgadmin' ),
+
+			'course_cancellation_subject'        => __( 'Course Cancellation Subject', 'lasntgadmin' ),
+			'course_cancellation'                => __( 'Course Cancellation Body', 'lasntgadmin' ),
 
 		];
 		foreach ( $fields as $subject => $field ) {
