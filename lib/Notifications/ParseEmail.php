@@ -41,6 +41,7 @@ class ParseEmail {
 			'expiry_period'            => get_field( 'field_63882047beae3', $post_ID, true ),
 			'link_to_more_information' => get_field( 'field_6388216175740', $post_ID, true ),
 			'course_order'             => get_field( 'field_6388218175741', $post_ID, true ),
+
 		];
 		return self::replace( $message, $course_fields );
 	}
@@ -72,7 +73,7 @@ class ParseEmail {
 	 * @param  string $message Message.
 	 * @return string
 	 */
-	public static function add_receiver_info( $user, $message ) {
+	public static function add_receiver_info( $user, $message, $post_ID ) {
 		$customer = new \WC_Customer( $user->ID );
 
 		$fields = [
@@ -80,7 +81,31 @@ class ParseEmail {
 			'to_user_name'       => $user->display_name,
 			'to_user_department' => get_field( 'field_63908cd5d9835', 'user_' . $user->ID, true ),
 			'to_user_phone'      => $customer->get_billing_phone(),
+			'course_quotas'      => self::add_quotas( $post_ID, $user ),
 		];
 		return self::replace( $message, $fields );
+	}
+
+	public static function add_quotas( $post_ID, $user ) {
+		global $wpdb;
+		$table          = $wpdb->prefix . 'groups_group';
+		$post_group_ids = NotificationUtils::get_post_group_ids( $post_ID );
+		$sql            = "SELECT * FROM $table WHERE group_id IN(" . implode( ', ', array_fill( 0, count( $post_group_ids ), '%s' ) ) . ')  ORDER BY name ASC';
+		// Call $wpdb->prepare passing the values of the array as separate arguments.
+		$query = call_user_func_array( array( $wpdb, 'prepare' ), array_merge( array( $sql ), $post_group_ids ) );
+
+		$groups = $wpdb->get_results( $query ); //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+
+		$quotas = [];
+		foreach ( $groups as $group ) {
+			$group_id = $group->group_id;
+			$quota    = NotificationUtils::get_group_quotas( $post_ID, $group_id );
+
+			$is_a_member = \Groups_User_Group::read( $user->ID, $group_id );
+			if ( $is_a_member ) {
+				$quotas [] = " <strong>{$group->name}:</strong> $quota ";
+			}
+		}
+		return join( ', ', $quotas );
 	}
 }

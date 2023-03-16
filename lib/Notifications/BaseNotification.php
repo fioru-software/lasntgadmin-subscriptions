@@ -68,6 +68,6 @@ abstract class BaseNotification {
 	public static function custom_canellation_with_message( $post_ID, $subject, $body ) {
 		error_log( 'custom cancellation..' . static::$user_role );
 		$users = NotificationUtils::get_users_in_group( $post_ID, static::$user_role );
-		NotificationUtils::parse_emails_for_users( $users, $subject, $body );
+		NotificationUtils::parse_emails_for_users( $users, $subject, $body, $post_ID );
 	}
 }
