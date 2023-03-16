@@ -251,7 +251,7 @@ class NotificationUtils {
 		if ( ! $email ) {
 			return false;
 		}
-		self::parse_emails_for_users( $users, $email['subject'], $email['body'] );
+		self::parse_emails_for_users( $users, $email['subject'], $email['body'], $post_ID );
 		return true;
 	}
 
@@ -274,7 +274,7 @@ class NotificationUtils {
 		$email_body    = $email['body'];
 		$users         = self::get_users_in_group( $post_ID, $user_role );
 		error_log( 'get_cOntent: ' . $user_role . '  :' . count( $users ) );
-		self::parse_emails_for_users( $users, $email_subject, $email_body );
+		self::parse_emails_for_users( $users, $email_subject, $email_body, $post_ID );
 		return true;
 	}
 	/**
@@ -285,10 +285,10 @@ class NotificationUtils {
 	 * @param  string $body Body.
 	 * @return void
 	 */
-	public static function parse_emails_for_users( $users, $subject, $body ): void {
+	public static function parse_emails_for_users( $users, $subject, $body, $post_ID ): void {
 		foreach ( $users as $user ) {
-			$unique_body    = ParseEmail::add_receiver_info( $user, $body );
-			$unique_subject = ParseEmail::add_receiver_info( $user, $subject );
+			$unique_body    = ParseEmail::add_receiver_info( $user, $body, $post_ID );
+			$unique_subject = ParseEmail::add_receiver_info( $user, $subject, $post_ID );
 			self::send_mail( $user->user_email, $unique_subject, $unique_body );
 		}
 	}
