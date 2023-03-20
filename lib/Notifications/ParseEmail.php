@@ -2,6 +2,8 @@
 namespace Lasntg\Admin\Subscriptions\Notifications;
 
 use Lasntg\Admin\Products\ProductUtils;
+use Groups_User_Group;
+
 class ParseEmail {
 	/**
 	 * Add course info.
@@ -101,7 +103,7 @@ class ParseEmail {
 			$group_id = $group->group_id;
 			$quota    = NotificationUtils::get_group_quotas( $post_ID, $group_id );
 
-			$is_a_member = \Groups_User_Group::read( $user->ID, $group_id );
+			$is_a_member = Groups_User_Group::read( $user->ID, $group_id );
 			if ( $is_a_member ) {
 				$quotas [] = " <strong>{$group->name}:</strong> $quota ";
 			}
