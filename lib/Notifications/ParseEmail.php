@@ -3,6 +3,7 @@ namespace Lasntg\Admin\Subscriptions\Notifications;
 
 use Lasntg\Admin\Products\ProductUtils;
 use Groups_User_Group;
+use Lasntg\Admin\Group\GroupUtils;
 
 class ParseEmail {
 	/**
@@ -89,15 +90,11 @@ class ParseEmail {
 	}
 
 	public static function add_quotas( $post_ID, $user ) {
-		global $wpdb;
-		$table          = $wpdb->prefix . 'groups_group';
 		$post_group_ids = NotificationUtils::get_post_group_ids( $post_ID );
-		$sql            = "SELECT * FROM $table WHERE group_id IN(" . implode( ', ', array_fill( 0, count( $post_group_ids ), '%s' ) ) . ')  ORDER BY name ASC';
-		// Call $wpdb->prepare passing the values of the array as separate arguments.
-		$query = call_user_func_array( array( $wpdb, 'prepare' ), array_merge( array( $sql ), $post_group_ids ) );
-
-		$groups = $wpdb->get_results( $query ); //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-
+		
+		$groups = GroupUtils::get_all_groups([
+			'include' => $post_group_ids
+		]);
 		$quotas = [];
 		foreach ( $groups as $group ) {
 			$group_id = $group->group_id;
