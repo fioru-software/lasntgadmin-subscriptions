@@ -253,6 +253,8 @@ class OptionPage {
 					Course Expiry Period: {%expiry_period%}<br />
 					Course Link To More Information: {%link_to_more_information%}<br />
 					Course Applicable Regulation: {%applicable_regulation%}<br />
+										
+					Course Quota: {%course_quotas%}
 				</p>
 			</div>
 
