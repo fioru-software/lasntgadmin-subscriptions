@@ -6,12 +6,8 @@ use Lasntg\Admin\Products\ProductUtils;
 use Lasntg\Admin\Subscriptions\SubscriptionPages\SubscriptionManager;
 
 class SubscriptionActionsFilters {
-
-
-
-
 	public static function init(): void {
-		add_action( 'post_updated', [ self::class, 'post_updated' ], 10, 3 );
+		add_action( 'post_updated', [ self::class, 'post_updated' ], 999, 3 );
 		add_action( 'wp_insert_post', [ self::class, 'wp_insert_post' ], 1, 2 );
 		add_filter( 'tag_row_actions', [ self::class, 'add_subscription_link_to_woocommerce_category' ], 10, 2 );
 
@@ -86,7 +82,7 @@ class SubscriptionActionsFilters {
 				Notifications::open_for_enrollment( $post_ID );
 				return $post_ID;
 			} else {
-				Notifications::course_status_change( $post_ID, $post_after->post_status, $post_before->post_status );
+				Notifications::course_status_change( $post_ID );
 				return $post_ID;
 			}
 		} elseif (
