@@ -102,7 +102,7 @@ class ParseEmail {
 			$group_id      = $group->group_id;
 			$quota         = NotificationUtils::get_group_quotas( $post_ID, $group_id );
 			$administrator = in_array( 'administrator', $user->roles );
-			
+
 			if ( $administrator ) {
 				$quotas [] = " <strong>{$group->name}:</strong> $quota ";
 				continue;
