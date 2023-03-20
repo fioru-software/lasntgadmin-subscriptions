@@ -49,7 +49,7 @@ class NotificationUtils {
 			// Location.
 			$in_location = SubscriptionManager::confirm_meta( $user->ID, $location, 'location' );
 
-			// Course Type.
+			// Event Type.
 			$in_course = SubscriptionManager::confirm_meta( $user->ID, $course_type, 'course_type' );
 
 			if ( ! $in_mailing_category || ! $in_location || ! $in_course ) {

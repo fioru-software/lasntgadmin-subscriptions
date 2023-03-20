@@ -142,7 +142,7 @@ class SubscriptionManager {
 		if ( $field['choices'] ) :
 			?>
 			<div class="div-list">
-				<h3>Course Type</h3>
+				<h3>Event Type</h3>
 				<ul  class='cat-list'>
 					<li><label><input type="checkbox" class='select_all_list' /><span class="label-text">All</span></label></li>
 					<?php foreach ( $field['choices'] as $value => $label ) : ?>
