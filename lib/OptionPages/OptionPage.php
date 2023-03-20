@@ -97,7 +97,7 @@ class OptionPage {
 		?>
 		<p>
 			<?php
-			echo __( 'Messages for training officerstttt...', 'lasntgadmin' ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 
+			echo __( 'Messages for training officers...', 'lasntgadmin' ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 
 			?>
 		</p>
 		<?php

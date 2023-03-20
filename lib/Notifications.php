@@ -47,7 +47,7 @@ class Notifications {
 		TrainingCenterNotifications::course_updated( $post_ID );
 		PrivateNotifications::course_updated( $post_ID );
 	}
-	public static function course_status_change( $post_ID, $post_after, $post_before ): void {
+	public static function course_status_change( $post_ID ): void {
 		TrainingCenterNotifications::status_changed( $post_ID );
 		ManagersNotifications::status_changed( $post_ID );
 		RegionalManagerNotifications::status_changed( $post_ID );

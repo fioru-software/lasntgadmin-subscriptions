@@ -91,15 +91,22 @@ class ParseEmail {
 
 	public static function add_quotas( $post_ID, $user ) {
 		$post_group_ids = NotificationUtils::get_post_group_ids( $post_ID );
-		
-		$groups = GroupUtils::get_all_groups([
-			'include' => $post_group_ids
-		]);
+
+		$groups = GroupUtils::get_all_groups(
+			[
+				'include' => $post_group_ids,
+			]
+		);
 		$quotas = [];
 		foreach ( $groups as $group ) {
-			$group_id = $group->group_id;
-			$quota    = NotificationUtils::get_group_quotas( $post_ID, $group_id );
-
+			$group_id      = $group->group_id;
+			$quota         = NotificationUtils::get_group_quotas( $post_ID, $group_id );
+			$administrator = in_array( 'administrator', $user->roles );
+			
+			if ( $administrator ) {
+				$quotas [] = " <strong>{$group->name}:</strong> $quota ";
+				continue;
+			}
 			$is_a_member = Groups_User_Group::read( $user->ID, $group_id );
 			if ( $is_a_member ) {
 				$quotas [] = " <strong>{$group->name}:</strong> $quota ";
