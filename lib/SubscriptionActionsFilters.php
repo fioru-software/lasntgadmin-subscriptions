@@ -7,7 +7,7 @@ use Lasntg\Admin\Subscriptions\SubscriptionPages\SubscriptionManager;
 
 class SubscriptionActionsFilters {
 	public static function init(): void {
-		add_action( 'post_updated', [ self::class, 'post_updated' ], 11, 3 );
+		add_action( 'post_updated', [ self::class, 'post_updated' ], 999, 3 );
 		add_action( 'wp_insert_post', [ self::class, 'wp_insert_post' ], 1, 2 );
 		add_filter( 'tag_row_actions', [ self::class, 'add_subscription_link_to_woocommerce_category' ], 10, 2 );
 
