@@ -6,8 +6,9 @@ use Lasntg\Admin\Products\ProductUtils;
 use Groups_User_Group;
 use Lasntg\Admin\Group\GroupUtils;
 
-class ParseEmail
-{
+class ParseEmail {
+
+
 	/**
 	 * Add course info.
 	 *
@@ -15,21 +16,22 @@ class ParseEmail
 	 * @param  string $message Message to replace with placeholders.
 	 * @return string
 	 */
-	public static function add_course_info($post_ID, $message)
-	{
-		$product       = new \WC_Product($post_ID);
+	public static function add_course_info( $post_ID, $message ) {
+		$product = new \WC_Product( $post_ID );
+		if ( ! isset( $_POST['acf'] ) ) { //phpcs:ignore WordPress.Security.NonceVerification.Missing
+			return;
+		}
+		$acf_fields = array_map( 'sanitize_text_field', wp_unslash( $_POST['acf'] ) ); //phpcs:ignore WordPress.Security.NonceVerification.Missing
 
-		$acf_fields = $_POST['acf'];
-		
-		$post = $_POST;
+		$post          = $_POST; //phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$course_fields = [
-			'code'                     => $post['_sku'],
-			'name'                     => $post['post_title'],
-			'cost'                     => $post['_regular_price'],
-			'capacity'                 => $post['_stock'],
+			'code'                     => sanitize_text_field( wp_unslash( $post['_sku'] ) ),
+			'name'                     => sanitize_text_field( wp_unslash( $post['post_title'] ) ),
+			'cost'                     => sanitize_text_field( wp_unslash( $post['_regular_price'] ) ),
+			'capacity'                 => sanitize_text_field( wp_unslash( $post['_stock'] ) ),
 			'description'              => $product->get_description(),
 			'link'                     => $product->get_permalink(),
-			'status'                   => ProductUtils::get_status_name($product->get_status()),
+			'status'                   => ProductUtils::get_status_name( $product->get_status() ),
 			'event_type'               => $acf_fields['field_6387864196776'],
 			'awarding_body'            => $acf_fields['field_638786be96777'],
 			'start_date'               => $acf_fields['field_63881aee31478'],
@@ -53,7 +55,7 @@ class ParseEmail
 			'course_order'             => $acf_fields['field_6388218175741'],
 
 		];
-		return self::replace($message, $course_fields);
+		return self::replace( $message, $course_fields );
 	}
 
 	/**
@@ -63,13 +65,12 @@ class ParseEmail
 	 * @param  array  $fields Fields.
 	 * @return string
 	 */
-	private static function replace($message, array $fields)
-	{
-		foreach ($fields as $name => $value) {
-			$message = str_replace("{%$name%}", $value, $message);
-			$message = str_replace("{% $name %}", $value, $message);
-			$message = str_replace("{%$name %}", $value, $message);
-			$message = str_replace("{% $name%}", $value, $message);
+	private static function replace( $message, array $fields ) {
+		foreach ( $fields as $name => $value ) {
+			$message = str_replace( "{%$name%}", $value, $message );
+			$message = str_replace( "{% $name %}", $value, $message );
+			$message = str_replace( "{%$name %}", $value, $message );
+			$message = str_replace( "{% $name%}", $value, $message );
 		}
 		return $message;
 	}
@@ -81,44 +82,44 @@ class ParseEmail
 	 * @param  string $message Message.
 	 * @return string
 	 */
-	public static function add_receiver_info($user, $message, $post_ID)
-	{
-		$customer = new \WC_Customer($user->ID);
+	public static function add_receiver_info( $user, $message, $post_ID ) {
+		$customer = new \WC_Customer( $user->ID );
 
 		$fields = [
 			'to_user_email'      => $user->user_email,
 			'to_user_name'       => $user->display_name,
-			'to_user_department' => get_field('field_63908cd5d9835', 'user_' . $user->ID, true),
+			'to_user_department' => get_field( 'field_63908cd5d9835', 'user_' . $user->ID, true ),
 			'to_user_phone'      => $customer->get_billing_phone(),
-			'course_quotas'      => self::add_quotas($post_ID, $user),
+			'course_quotas'      => self::add_quotas( $post_ID, $user ),
 		];
-		return self::replace($message, $fields);
+		return self::replace( $message, $fields );
 	}
 
-	public static function add_quotas($post_ID, $user)
-	{
-		// removed  NotificationUtils::get_post_group_ids since it got old data rather than new
-		
+	public static function add_quotas( $post_ID, $user ) {
+		$group_ids = NotificationUtils::get_post_group_ids( $post_ID );
+		echo '<pre>';
+		var_dump( $group_ids );
+		die();
 		$groups = GroupUtils::get_all_groups(
 			[
-				'include' => $_POST['groups-read'],
+				'include' => $group_ids,
 			]
 		);
 		$quotas = [];
-		foreach ($groups as $group) {
+		foreach ( $groups as $group ) {
 			$group_id      = $group->group_id;
-			$quota         = NotificationUtils::get_group_quotas($post_ID, $group_id);
-			$administrator = in_array('administrator', $user->roles);
+			$quota         = NotificationUtils::get_group_quotas( $post_ID, $group_id );
+			$administrator = in_array( 'administrator', $user->roles );
 
-			if ($administrator) {
+			if ( $administrator ) {
 				$quotas[] = " <strong>{$group->name}:</strong> $quota ";
 				continue;
 			}
-			$is_a_member = Groups_User_Group::read($user->ID, $group_id);
-			if ($is_a_member) {
+			$is_a_member = Groups_User_Group::read( $user->ID, $group_id );
+			if ( $is_a_member ) {
 				$quotas[] = " <strong>{$group->name}:</strong> $quota ";
 			}
 		}
-		return join(', ', $quotas);
+		return join( ', ', $quotas );
 	}
 }
