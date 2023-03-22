@@ -11,15 +11,18 @@ class NotificationUtils {
 	/**
 	 * Should be placed in groups plugin.
 	 */
-	public static function get_post_group_ids( $post_ID ) {
-		return \Groups_Post_Access::get_read_group_ids( $post_ID );
+	public static function get_post_group_ids( ) {
+		// this is of the assumption it's the current group.
+		return $_POST['groups-read'];
 	}
 
 	/**
 	 * @todo replace with QuotaUtils
 	 */
 	public static function get_group_quotas( $post_ID, $group_id ) {
-		$value = get_post_meta( $post_ID, '_quotas_field_' . $group_id, true );
+		
+		// $value = get_post_meta( $post_ID, '_quotas_field_' . $group_id, true );
+		$value = $_POST['_quotas_field_' . $group_id];
 		if ( is_numeric( $value ) ) {
 			return (int) $value;
 		}
@@ -38,8 +41,9 @@ class NotificationUtils {
 		$product = new \WC_Product( $post_ID );
 		$cat_ids = $product->get_category_ids();
 
-		$course_type = get_field( self::$course_acf, $post_ID );
-		$location    = get_field( self::$location_acf, $post_ID );
+		$acf = $_POST['acf'];
+		$course_type = $acf[self::$course_acf];
+		$location    = $acf[self::$location_acf];
 
 		$cat_id = $cat_ids[0];
 		foreach ( $users as $key => $user ) {
@@ -72,7 +76,7 @@ class NotificationUtils {
 		global $wpdb;
 
 		$user_role = "%$role%";
-		$group_ids = self::get_post_group_ids( $post_ID );
+		$group_ids = self::get_post_group_ids( );
 		$users     = [];
 
 		// check quotas for training officer.
