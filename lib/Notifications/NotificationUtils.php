@@ -6,13 +6,17 @@ use Lasntg\Admin\Subscriptions\OptionPages\Editors;
 use Lasntg\Admin\Subscriptions\SubscriptionPages\SubscriptionManager;
 
 class NotificationUtils {
+
 	public static $location_acf = 'field_63881b84798a5';
 	public static $course_acf   = 'field_6387864196776';
 	/**
 	 * Should be placed in groups plugin.
 	 */
 	public static function get_post_group_ids( $post_ID ) {
-		return \Groups_Post_Access::get_read_group_ids( $post_ID );
+		// this is of the assumption it's the current group.
+		return isset( $_POST['groups-read'] ) //phpcs:ignore WordPress.Security.NonceVerification.Missing
+			? (array) array_map( 'sanitize_text_field', wp_unslash( $_POST['groups-read'] ) ) //phpcs:ignore WordPress.Security.NonceVerification.Missing
+			: \Groups_Post_Access::get_read_group_ids( $post_ID );
 	}
 
 	/**
@@ -20,6 +24,9 @@ class NotificationUtils {
 	 */
 	public static function get_group_quotas( $post_ID, $group_id ) {
 		$value = get_post_meta( $post_ID, '_quotas_field_' . $group_id, true );
+		if ( isset( $_POST[ '_quotas_field_' . $group_id ] ) ) { //phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$value = sanitize_text_field( wp_unslash( $_POST[ '_quotas_field_' . $group_id ] ) ); //phpcs:ignore WordPress.Security.NonceVerification.Missing
+		}
 		if ( is_numeric( $value ) ) {
 			return (int) $value;
 		}
@@ -37,9 +44,12 @@ class NotificationUtils {
 		 */
 		$product = new \WC_Product( $post_ID );
 		$cat_ids = $product->get_category_ids();
-
-		$course_type = get_field( self::$course_acf, $post_ID );
-		$location    = get_field( self::$location_acf, $post_ID );
+		if ( ! isset( $_POST['acf'] ) ) { //phpcs:ignore WordPress.Security.NonceVerification.Missing
+			return;
+		}
+		$acf         = $_POST['acf']; //phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$course_type = sanitize_text_field( wp_unslash( $acf[ self::$course_acf ] ) );
+		$location    = sanitize_text_field( wp_unslash( $acf[ self::$location_acf ] ) );
 
 		$cat_id = $cat_ids[0];
 		foreach ( $users as $key => $user ) {
@@ -77,11 +87,13 @@ class NotificationUtils {
 
 		// check quotas for training officer.
 		// remove groups with zero quotas.
-		if ( 'training_officer' === $role ||
-		'customer' == $role
+		if (
+			'training_officer' === $role ||
+			'customer' == $role
 		) {
 			foreach ( $group_ids as $key => $group_id ) {
-				$value = self::get_group_quotas( $post_ID, $group_id );
+				$group_id = (int) $group_id;
+				$value    = self::get_group_quotas( $post_ID, $group_id );
 
 				if ( 0 === $value ) {
 					unset( $group_ids[ $key ] );
@@ -107,8 +119,10 @@ class NotificationUtils {
 
 		$results = $wpdb->get_results( $wpdb->prepare( $query, $params ) ); //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		// get unique users rather than duplicates.
-		if ( 'training_officer' === $role ||
-		'customer' == $role ) {
+		if (
+			'training_officer' === $role ||
+			'customer' == $role
+		) {
 			// make sure that users with orders do see notifications even if though unsubscribed.
 			$results  = self::check_subscription( $post_ID, $results );
 			$results  = array_merge( $users, $results );
