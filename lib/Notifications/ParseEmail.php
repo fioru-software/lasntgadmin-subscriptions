@@ -5,9 +5,51 @@ namespace Lasntg\Admin\Subscriptions\Notifications;
 use Lasntg\Admin\Products\ProductUtils;
 use Groups_User_Group;
 use Lasntg\Admin\Group\GroupUtils;
-
+use WC_Product;
 class ParseEmail {
 
+	/**
+	 * Add course info.
+	 *
+	 * @param  int    $post_ID Post ID.
+	 * @param  string $message Message to replace with placeholders.
+	 * @return string
+	 */
+	public static function add_course_info_with_product( $post_ID, $message ) {
+		$product       = new WC_Product( $post_ID );
+		$course_fields = [
+			'code'                     => $product->get_sku(),
+			'name'                     => $product->get_title(),
+			'cost'                     => $product->get_price(),
+			'capacity'                 => $product->get_stock_quantity(),
+			'description'              => $product->get_description(),
+			'link'                     => $product->get_permalink(),
+			'status'                   => ProductUtils::get_status_name( $product->get_status() ),
+			'event_type'               => get_field( 'field_6387864196776', $post_ID, true ),
+			'awarding_body'            => get_field( 'field_638786be96777', $post_ID, true ),
+			'start_date'               => get_field( 'field_63881aee31478', $post_ID, true ),
+			'start_time'               => get_field( 'field_63881b0531479', $post_ID, true ),
+			'end_date'                 => get_field( 'field_63881b1e3147a', $post_ID, true ),
+			'end_time'                 => get_field( 'field_63881b2c3147b', $post_ID, true ),
+			'duration'                 => get_field( 'field_63881b63798a4', $post_ID, true ),
+			'location'                 => get_field( 'field_63881b84798a5', $post_ID, true ),
+			'training_centre'          => get_field( 'field_63881beb798a7', $post_ID, true ),
+			'training_group'           => get_field( 'field_63881c1ff4453', $post_ID, true ),
+			'trainer_name'             => get_field( 'field_63881cc2f4455', $post_ID, true ),
+			'trainer_email'            => get_field( 'field_63881ce6f4456', $post_ID, true ),
+			'training_provider'        => get_field( 'field_63881cf7f4457', $post_ID, true ),
+			'training_aim'             => get_field( 'field_6387890fd6a25', $post_ID, true ),
+			'award'                    => get_field( 'field_63881d74f445a', $post_ID, true ),
+			'applicable_regulation'    => get_field( 'field_63878939d6a27', $post_ID, true ),
+			'primary_target_grade'     => get_field( 'field_63881f7f3e5af', $post_ID, true ),
+			'other_grades_applicable'  => get_field( 'field_638820173e5b0', $post_ID, true ),
+			'expiry_period'            => get_field( 'field_63882047beae3', $post_ID, true ),
+			'link_to_more_information' => get_field( 'field_6388216175740', $post_ID, true ),
+			'course_order'             => get_field( 'field_6388218175741', $post_ID, true ),
+
+		];
+		return self::replace( $message, $course_fields );
+	}
 
 	/**
 	 * Add course info.
@@ -19,7 +61,8 @@ class ParseEmail {
 	public static function add_course_info( $post_ID, $message ) {
 		$product = new \WC_Product( $post_ID );
 		if ( ! isset( $_POST['acf'] ) ) { //phpcs:ignore WordPress.Security.NonceVerification.Missing
-			return;
+			// incase it's order.
+			return self::add_course_info_with_product( $post_ID, $message );
 		}
 		$acf_fields = array_map( 'sanitize_text_field', wp_unslash( $_POST['acf'] ) ); //phpcs:ignore WordPress.Security.NonceVerification.Missing
 
@@ -97,9 +140,7 @@ class ParseEmail {
 
 	public static function add_quotas( $post_ID, $user ) {
 		$group_ids = NotificationUtils::get_post_group_ids( $post_ID );
-		echo '<pre>';
-		var_dump( $group_ids );
-		die();
+
 		$groups = GroupUtils::get_all_groups(
 			[
 				'include' => $group_ids,

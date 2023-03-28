@@ -129,6 +129,14 @@ class Editors {
 	public static function status_set_to_enrolling_subject(): void {
 		self::add_text_field( 'status_set_to_enrolling_subject' );
 	}
+	/**
+	 * Status Set To Enrolling Subject.
+	 *
+	 * @return void
+	 */
+	public static function course_space_available_subject(): void {
+		self::add_text_field( 'course_space_available_subject' );
+	}
 
 	/**
 	 * Course Update WP_Editor.
@@ -219,6 +227,15 @@ class Editors {
 	}
 
 	/**
+	 * New Course Editor.
+	 *
+	 * @return void
+	 */
+	public static function course_space_available(): void {
+		self::wp_editor( 'course_space_available' );
+	}
+
+	/**
 	 * Create WP_Editor.
 	 *
 	 * @param  mixed $name Name of the editor.
@@ -247,6 +264,7 @@ class Editors {
 	 */
 	public static function get_options( $name ) {
 		self::$options = get_option( self::$option_name );
+
 		return self::$options && isset( self::$options[ $name ] ) ? self::$options[ $name ] : '';
 	}
 }

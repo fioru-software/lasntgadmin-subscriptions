@@ -3,9 +3,11 @@
 namespace Lasntg\Admin\Subscriptions;
 
 use Lasntg\Admin\Products\ProductUtils;
+use Lasntg\Admin\Subscriptions\Notifications\PrivateNotifications;
 use Lasntg\Admin\Subscriptions\SubscriptionPages\SubscriptionManager;
 
 class SubscriptionActionsFilters {
+
 	public static function init(): void {
 		add_action( 'post_updated', [ self::class, 'post_updated' ], 999, 3 );
 		add_action( 'wp_insert_post', [ self::class, 'wp_insert_post' ], 1, 2 );
@@ -13,8 +15,23 @@ class SubscriptionActionsFilters {
 
 		add_action( 'wp_ajax_lasntgadmin_subscribe', [ self::class, 'subscribe' ] );
 		add_action( 'admin_enqueue_scripts', [ self::class, 'admin_enqueue_scripts' ] );
+		add_action( 'woocommerce_order_status_changed', [ self::class, 'waiting_list_order_updated' ], 10, 3 );
 	}
-
+	public static function waiting_list_order_updated( $order_id, $old_status, $new_status ) {
+		if ( 'waiting-list' !== $old_status && 'pending' !== $new_status ) {
+			return;
+		}
+		$order = wc_get_order( $order_id );
+		$items = $order->get_items( apply_filters( 'woocommerce_purchase_order_item_types', 'line_item' ) ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		foreach ( $items as $item ) {
+			$product_id = $item->get_product_id();
+			$user_id    = $order->get_user_id();
+			if ( $user_id ) {
+				$user = get_user_by( 'ID', $user_id );
+				PrivateNotifications::space_available( $product_id, $user, $order->get_checkout_payment_url() );
+			}
+		}
+	}
 	public static function admin_enqueue_scripts() {
 		$screen = get_current_screen();
 		if ( $screen && 'edit-tags' === $screen->base ) {

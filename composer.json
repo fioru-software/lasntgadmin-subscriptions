@@ -56,7 +56,7 @@
         "fioru/lasntgadmin-attendees": "^3.1.0",
         "fioru/lasntgadmin-products": "^5.4.0",
         "fioru/lasntgadmin-users": "^3.0.2",
-        "fioru/lasntgadmin-orders": "^1.0",
+        "fioru/lasntgadmin-orders": "^1.5",
         "fioru/lasntgadmin-groups": "^1.1"
     },
     "require-dev": {

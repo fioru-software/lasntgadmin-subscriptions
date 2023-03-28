@@ -33,6 +33,7 @@ class OptionPage {
 			'course_cancellation',
 			'status_change',
 			'course_update',
+			'course_space_available',
 		];
 		$text_fields   = [
 			'course_open_for_enrollment_subject',
@@ -40,6 +41,7 @@ class OptionPage {
 			'course_update_subject',
 			'status_change_subject',
 			'course_cancellation_subject',
+			'course_space_available_subject',
 		];
 
 		return self::sanitize_fieds( $input, $editor_fields, $text_fields );
@@ -111,7 +113,7 @@ class OptionPage {
 			static::$option_name
 		);
 	}
-	public static function set_fields(): void {
+	public static function set_fields( $private = 0 ): void {
 		$fields = [
 			'course_open_for_enrollment_subject' => __( 'Course Open For Enrollment Subject', 'lasntgadmin' ),
 			'course_open_for_enrollment'         => __( 'Course Open For Enrollment', 'lasntgadmin' ),
@@ -129,6 +131,10 @@ class OptionPage {
 			'course_cancellation'                => __( 'Course Cancellation Body', 'lasntgadmin' ),
 
 		];
+		if ( $private ) {
+			$fields ['course_space_available_subject'] = __( 'Course has space available Subject', 'lasntgadmin' );
+			$fields ['course_space_available']         = __( 'Course has space available Body', 'lasntgadmin' );
+		}
 		foreach ( $fields as $subject => $field ) {
 			Editors::add_settings_field(
 				$subject,

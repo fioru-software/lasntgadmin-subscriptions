@@ -223,7 +223,7 @@ class NotificationUtils {
 	 * @param  string $body Body.
 	 * @return bool|array returns false or an array.
 	 */
-	protected static function get_email_subject_and_body( $post_ID, $subject, $body ) {
+	public static function get_email_subject_and_body( $post_ID, $subject, $body ) {
 		$email_subject = Editors::get_options( $subject );
 		$email_body    = Editors::get_options( $body );
 		if ( ! $email_subject || ! $email_body ) {
@@ -243,7 +243,8 @@ class NotificationUtils {
 	public static function parse_info( $post_ID, $email_subject, $email_body ): array {
 		$email_subject = ParseEmail::add_course_info( $post_ID, $email_subject );
 		$email_body    = ParseEmail::add_course_info( $post_ID, $email_body );
-		$email_body    = apply_filters( 'the_content', $email_body ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
+		$email_body = apply_filters( 'the_content', $email_body ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		return [
 			'subject' => $email_subject,
 			'body'    => $email_body,
@@ -287,7 +288,6 @@ class NotificationUtils {
 		$email_subject = $email['subject'];
 		$email_body    = $email['body'];
 		$users         = self::get_users_in_group( $post_ID, $user_role );
-		error_log( 'get_cOntent: ' . $user_role . '  :' . count( $users ) );
 		self::parse_emails_for_users( $users, $email_subject, $email_body, $post_ID );
 		return true;
 	}
@@ -317,7 +317,6 @@ class NotificationUtils {
 	 */
 	protected static function send_mail( $email, $subject, $body ): bool {
 		$headers = array( 'Content-Type: text/html; charset=UTF-8' );
-		error_log( 'SendMail: ' . $email );
 		return wp_mail( $email, $subject, $body, $headers );
 	}
 }

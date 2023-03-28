@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "77951aef960588c4e2ddd3d5531e84fd",
+    "content-hash": "7100a7e979eea794a486543150f5b98f",
     "packages": [
         {
             "name": "composer/installers",
@@ -154,16 +154,16 @@
         },
         {
             "name": "fioru/lasntgadmin-attendees",
-            "version": "3.3.0",
+            "version": "3.4.0",
             "source": {
                 "type": "git",
                 "url": "git@github.com:fioru-software/lasntgadmin-attendees.git",
-                "reference": "11c07bd30e990e54f2382e4983aec30f02c366c6"
+                "reference": "6dbbaa0d45b68fdb0eca6170e0c18f951cfa8fda"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-attendees/zipball/11c07bd30e990e54f2382e4983aec30f02c366c6",
-                "reference": "11c07bd30e990e54f2382e4983aec30f02c366c6",
+                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-attendees/zipball/6dbbaa0d45b68fdb0eca6170e0c18f951cfa8fda",
+                "reference": "6dbbaa0d45b68fdb0eca6170e0c18f951cfa8fda",
                 "shasum": ""
             },
             "require": {
@@ -222,10 +222,10 @@
                 ]
             },
             "support": {
-                "source": "https://github.com/fioru-software/lasntgadmin-attendees/tree/3.3.0",
+                "source": "https://github.com/fioru-software/lasntgadmin-attendees/tree/3.4.0",
                 "issues": "https://github.com/fioru-software/lasntgadmin-attendees/issues"
             },
-            "time": "2023-03-15T17:06:31+00:00"
+            "time": "2023-03-27T13:36:29+00:00"
         },
         {
             "name": "fioru/lasntgadmin-grant-funded-payment-gateway",
@@ -374,24 +374,24 @@
         },
         {
             "name": "fioru/lasntgadmin-orders",
-            "version": "1.4.0",
+            "version": "1.5.1-rc1",
             "source": {
                 "type": "git",
                 "url": "git@github.com:fioru-software/lasntgadmin-orders.git",
-                "reference": "9394e41268ff0b22d242f8430b69867f88fa8045"
+                "reference": "c596d1206200cede6b7ce0ee9b55c1eb84eaf293"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-orders/zipball/9394e41268ff0b22d242f8430b69867f88fa8045",
-                "reference": "9394e41268ff0b22d242f8430b69867f88fa8045",
+                "url": "https://api.github.com/repos/fioru-software/lasntgadmin-orders/zipball/c596d1206200cede6b7ce0ee9b55c1eb84eaf293",
+                "reference": "c596d1206200cede6b7ce0ee9b55c1eb84eaf293",
                 "shasum": ""
             },
             "require": {
                 "composer/installers": "~2.0",
                 "fioru/lasntgadmin-attendees": "^3.1.0",
                 "fioru/lasntgadmin-grant-funded-payment-gateway": "^1.0.7",
-                "fioru/lasntgadmin-groups": "^1.0.6",
-                "fioru/lasntgadmin-products": "^5.0.4"
+                "fioru/lasntgadmin-groups": "^1.1",
+                "fioru/lasntgadmin-products": "^5.4.0"
             },
             "require-dev": {
                 "dealerdirect/phpcodesniffer-composer-installer": "^0.7",
@@ -443,10 +443,10 @@
                 ]
             },
             "support": {
-                "source": "https://github.com/fioru-software/lasntgadmin-orders/tree/1.4.0",
+                "source": "https://github.com/fioru-software/lasntgadmin-orders/tree/1.5.1-rc1",
                 "issues": "https://github.com/fioru-software/lasntgadmin-orders/issues"
             },
-            "time": "2023-03-15T17:05:37+00:00"
+            "time": "2023-03-27T15:56:57+00:00"
         },
         {
             "name": "fioru/lasntgadmin-products",
@@ -2028,12 +2028,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHPCSExtra.git",
-                "reference": "a077c4ad65b906768ed2f820701958b57f605be0"
+                "reference": "d2adbf92ee74aed1225f88184a89e609d8dda1e3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSExtra/zipball/a077c4ad65b906768ed2f820701958b57f605be0",
-                "reference": "a077c4ad65b906768ed2f820701958b57f605be0",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSExtra/zipball/d2adbf92ee74aed1225f88184a89e609d8dda1e3",
+                "reference": "d2adbf92ee74aed1225f88184a89e609d8dda1e3",
                 "shasum": ""
             },
             "require": {
@@ -2084,7 +2084,7 @@
                 "issues": "https://github.com/PHPCSStandards/PHPCSExtra/issues",
                 "source": "https://github.com/PHPCSStandards/PHPCSExtra"
             },
-            "time": "2023-01-09T22:15:31+00:00"
+            "time": "2023-03-27T13:34:42+00:00"
         },
         {
             "name": "phpcsstandards/phpcsutils",
@@ -2092,12 +2092,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHPCSUtils.git",
-                "reference": "321702124ed85acf9e836ef059635c06df738208"
+                "reference": "343c01e4c88ad30f6015f1a2aaa0f139c234d6af"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSUtils/zipball/321702124ed85acf9e836ef059635c06df738208",
-                "reference": "321702124ed85acf9e836ef059635c06df738208",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSUtils/zipball/343c01e4c88ad30f6015f1a2aaa0f139c234d6af",
+                "reference": "343c01e4c88ad30f6015f1a2aaa0f139c234d6af",
                 "shasum": ""
             },
             "require": {
@@ -2159,7 +2159,7 @@
                 "issues": "https://github.com/PHPCSStandards/PHPCSUtils/issues",
                 "source": "https://github.com/PHPCSStandards/PHPCSUtils"
             },
-            "time": "2023-03-20T08:20:45+00:00"
+            "time": "2023-03-25T12:46:21+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -2167,12 +2167,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "fe7b8ad5d2dd99abb89b2c5a094a2aac10119997"
+                "reference": "539546376eccd3b120076a905a8bf1160ee5cd23"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/fe7b8ad5d2dd99abb89b2c5a094a2aac10119997",
-                "reference": "fe7b8ad5d2dd99abb89b2c5a094a2aac10119997",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/539546376eccd3b120076a905a8bf1160ee5cd23",
+                "reference": "539546376eccd3b120076a905a8bf1160ee5cd23",
                 "shasum": ""
             },
             "require": {
@@ -2237,7 +2237,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-03-14T13:35:01+00:00"
+            "time": "2023-03-22T08:12:13+00:00"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -2486,12 +2486,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "07289f06e1d23f7fa50d10942de18f9d0f2063c2"
+                "reference": "b65d59a059d3004a040c16a82e07bbdf6cfdd115"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/07289f06e1d23f7fa50d10942de18f9d0f2063c2",
-                "reference": "07289f06e1d23f7fa50d10942de18f9d0f2063c2",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/b65d59a059d3004a040c16a82e07bbdf6cfdd115",
+                "reference": "b65d59a059d3004a040c16a82e07bbdf6cfdd115",
                 "shasum": ""
             },
             "require": {
@@ -2565,7 +2565,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/9.6"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/9.6.6"
             },
             "funding": [
                 {
@@ -2581,7 +2581,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-03-19T14:12:15+00:00"
+            "time": "2023-03-27T11:43:46+00:00"
         },
         {
             "name": "psr/container",
@@ -3650,12 +3650,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/resource-operations.git",
-                "reference": "e1157eac767e4dc4ae40dd9aab7fb4de6e56bd32"
+                "reference": "20bdda85c7c585ab265c0c37ec052a019bae29c4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/resource-operations/zipball/e1157eac767e4dc4ae40dd9aab7fb4de6e56bd32",
-                "reference": "e1157eac767e4dc4ae40dd9aab7fb4de6e56bd32",
+                "url": "https://api.github.com/repos/sebastianbergmann/resource-operations/zipball/20bdda85c7c585ab265c0c37ec052a019bae29c4",
+                "reference": "20bdda85c7c585ab265c0c37ec052a019bae29c4",
                 "shasum": ""
             },
             "require": {
@@ -3697,7 +3697,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-02-08T06:53:39+00:00"
+            "time": "2023-03-25T08:11:39+00:00"
         },
         {
             "name": "sebastian/type",
@@ -3872,12 +3872,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "7ec6e8b49aa2be157b783eb793c979f8cdaa69d7"
+                "reference": "3cd51fd2e6c461ca678f84d419461281bd87a0a8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/7ec6e8b49aa2be157b783eb793c979f8cdaa69d7",
-                "reference": "7ec6e8b49aa2be157b783eb793c979f8cdaa69d7",
+                "url": "https://api.github.com/repos/symfony/console/zipball/3cd51fd2e6c461ca678f84d419461281bd87a0a8",
+                "reference": "3cd51fd2e6c461ca678f84d419461281bd87a0a8",
                 "shasum": ""
             },
             "require": {
@@ -3963,7 +3963,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-03-14T14:59:20+00:00"
+            "time": "2023-03-25T09:27:28+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
@@ -5002,12 +5002,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/WordPress/WordPress-Coding-Standards.git",
-                "reference": "f4d4ff58ddfe1ca79575e60c552543966a5ed7b2"
+                "reference": "d7429810b16bf435dc642d9b917fc87e8bc890d7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WordPress/WordPress-Coding-Standards/zipball/f4d4ff58ddfe1ca79575e60c552543966a5ed7b2",
-                "reference": "f4d4ff58ddfe1ca79575e60c552543966a5ed7b2",
+                "url": "https://api.github.com/repos/WordPress/WordPress-Coding-Standards/zipball/d7429810b16bf435dc642d9b917fc87e8bc890d7",
+                "reference": "d7429810b16bf435dc642d9b917fc87e8bc890d7",
                 "shasum": ""
             },
             "require": {
@@ -5051,7 +5051,7 @@
                 "source": "https://github.com/WordPress/WordPress-Coding-Standards",
                 "wiki": "https://github.com/WordPress/WordPress-Coding-Standards/wiki"
             },
-            "time": "2023-03-07T17:51:30+00:00"
+            "time": "2023-03-27T08:29:21+00:00"
         },
         {
             "name": "yoast/phpunit-polyfills",
