@@ -28,7 +28,6 @@ class Notifications {
 
 		$email = NotificationUtils::parse_info( $post_ID, $subject, $body );
 		if ( $subject && $body ) {
-			error_log( "Cancelling......\n" );
 			ManagersNotifications::custom_canellation_with_message( $post_ID, $email['subject'], $email['body'] );
 			RegionalManagerNotifications::custom_canellation_with_message( $post_ID, $email['subject'], $email['body'] );
 			TrainingCenterNotifications::custom_canellation_with_message( $post_ID, $email['subject'], $email['body'] );

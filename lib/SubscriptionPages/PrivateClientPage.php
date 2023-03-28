@@ -87,4 +87,7 @@ class PrivateClientPage {
 		<?php
 		SubscriptionManager::show_form();
 	}
+
+	public static function sanitize() {
+	}
 }
