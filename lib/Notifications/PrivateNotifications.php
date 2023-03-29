@@ -14,6 +14,7 @@ class PrivateNotifications extends BaseNotification {
 			$user,
 		];
 		if ( $email && $email['subject'] && $email['body'] ) {
+			$link    = "<a href='$link'>Payment Link</a>";
 			$subject = str_replace( '{%payment-link%}', $link, $email['subject'] );
 			$body    = str_replace( '{%payment-link%}', $link, $email['body'] );
 			NotificationUtils::parse_emails_for_users( $users, $subject, $body, $post_ID );

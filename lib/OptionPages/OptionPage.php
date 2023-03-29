@@ -259,8 +259,7 @@ class OptionPage {
 					Course Expiry Period: {%expiry_period%}<br />
 					Course Link To More Information: {%link_to_more_information%}<br />
 					Course Applicable Regulation: {%applicable_regulation%}<br />
-										
-					Course Quota: {%course_quotas%}
+					Course Quota: {%course_quotas%}<br/>
 				</p>
 			</div>
 
@@ -272,6 +271,11 @@ class OptionPage {
 					Department: {%to_user_department%} <small>(If National Managaer)</small><br />
 					Phone: {%to_user_phone%}<br />
 				</p>
+			</div>
+
+			<div style="margin-left: 12px">
+			<p><strong>Order Info</strong></p>
+				<p>Payment Link {%payment-link%}</p>
 			</div>
 		</div>
 		<?php
