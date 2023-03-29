@@ -5,6 +5,7 @@
  * Description:       Manages subscriptions to courses.
  * Version:           2.1.0-rc2
  * Requires PHP:      7.2
+ * Requires PHP:      7.2
  * Text Domain:       lasntgadmin
  * Domain Path:       /languages
  */
