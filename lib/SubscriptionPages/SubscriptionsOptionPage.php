@@ -2,7 +2,7 @@
 
 namespace Lasntg\Admin\Subscriptions\SubscriptionPages;
 
-class TrainingOfficerOptionPage {
+class SubscriptionsOptionPage {
 
 
 	public static function init(): void {

@@ -17,7 +17,7 @@ require_once getenv( 'COMPOSER_AUTOLOAD_FILEPATH' );
 
 use Lasntg\Admin\Subscriptions\{ PluginUtils, SubscriptionActionsFilters, CustomMessages};
 use Lasntg\Admin\Subscriptions\OptionPages\{NationalManagerOptions, TrainingOfficersOptions, PrivateClientOptions, RegionalManagerOptions};
-use Lasntg\Admin\Subscriptions\SubscriptionPages\{TrainingOfficerOptionPage, PrivateClientPage};
+use Lasntg\Admin\Subscriptions\SubscriptionPages\{SubscriptionsOptionPage, PrivateClientPage, RegionalManagerOptionPage};
 
 register_activation_hook( __FILE__, [ PluginUtils::class, 'activate' ] );
 register_deactivation_hook( __FILE__, [ PluginUtils::class, 'deactivate' ] );
@@ -28,5 +28,5 @@ TrainingOfficersOptions::init();
 RegionalManagerOptions::init();
 PrivateClientOptions::init();
 CustomMessages::init();
-TrainingOfficerOptionPage::init();
+SubscriptionsOptionPage::init();
 PrivateClientPage::init();
