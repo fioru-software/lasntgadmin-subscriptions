@@ -115,8 +115,8 @@ class OptionPage {
 	}
 	public static function set_fields( $private = 0 ): void {
 		$fields = [
-			'course_open_for_enrollment_subject' => __( 'Course Open For Enrollment Subject', 'lasntgadmin' ),
-			'course_open_for_enrollment'         => __( 'Course Open For Enrollment', 'lasntgadmin' ),
+			'course_open_for_enrollment_subject' => __( 'Course Open For Enrolment Subject', 'lasntgadmin' ),
+			'course_open_for_enrollment'         => __( 'Course Open For Enrolment', 'lasntgadmin' ),
 
 			'course_new_subject'                 => __( 'New Course Subject', 'lasntgadmin' ),
 			'course_new'                         => __( 'New Course Body', 'lasntgadmin' ),
