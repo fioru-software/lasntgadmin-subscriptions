@@ -2,7 +2,7 @@
 
 namespace Lasntg\Admin\Subscriptions\SubscriptionPages;
 
-class RegionalManagerOptionPage {
+class SubscriptionsOptionPage {
 
 
 	public static function init(): void {

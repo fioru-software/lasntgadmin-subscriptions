@@ -25,7 +25,7 @@ class Capabilities {
 	 * Regional training officer capabilities
 	 */
 	public static function get_regional_training_centre_manager_capabilities(): array {
-		return [];
+		return ['lasntg_list_options'];
 	}
 
 	/**
