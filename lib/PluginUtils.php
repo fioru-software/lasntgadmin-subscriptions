@@ -29,5 +29,3 @@ class PluginUtils {
 		return sprintf( '/var/www/html/wp-content/plugins/%s', self::get_kebab_case_name() );
 	}
 }
-
-
