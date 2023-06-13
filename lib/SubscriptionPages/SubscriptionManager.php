@@ -58,9 +58,8 @@ class SubscriptionManager {
 			<div class="lists">
 
 				<?php
-				// Show Categories, locations and courses.
+				// Show Categories and courses.
 				self::show_categories();
-				self::show_locations();
 				self::show_courses();
 				?>
 
@@ -116,25 +115,7 @@ class SubscriptionManager {
 		</div>
 		<?php
 	}
-	public static function show_locations() {
-		$locations = self::get_all_inputs( get_current_user_id(), 'location' );
-		$field     = get_field_object( NotificationUtils::$location_acf );
-		if ( $field['choices'] ) :
-			?>
-			<div class="div-list">
-				<h3>Location</h3>
-				<ul  class='cat-list'>
-					<li><label><input type="checkbox" class='select_all_list' />All</label></li>
-					<?php foreach ( $field['choices'] as $value => $label ) : ?>
-						<li><label><input type="checkbox" name="location[]" value="<?php echo esc_attr( $value ); ?>" <?php echo in_array( $value, $locations ) ? 'checked' : 'no'; ?> /><?php echo esc_attr( $label ); ?></label></li>
-					<?php endforeach; ?>
-				</ul>
 
-			</div>
-
-			<?php
-		endif;
-	}
 
 	public static function show_courses() {
 		$course_types = self::get_all_inputs( get_current_user_id(), 'course_type' );
@@ -178,7 +159,6 @@ endif;
 		self::remove_all_from_mailing_list( $current_user_id, 'course_type' );
 		if (
 			! isset( $_POST['child_cat'] ) &&
-			! isset( $_POST['location'] ) &&
 			! isset( $_POST['course_type'] )
 		) {
 			self::redirect_back( $request );
@@ -186,16 +166,10 @@ endif;
 		}
 
 		$cats         = wp_unslash( $_POST['child_cat'] ); //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$locations    = wp_unslash( $_POST['location'] ); //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$course_types = wp_unslash( $_POST['course_type'] ); //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		foreach ( $cats as $cat ) {
 			$cat = sanitize_text_field( $cat );
 			self::add_to_mailing_list( $current_user_id, (int) $cat );
-		}
-
-		foreach ( $locations as $location ) {
-			$location = sanitize_text_field( $location );
-			self::add_to_mailing_list( $current_user_id, $location, 'location' );
 		}
 
 		foreach ( $course_types as $course_type ) {

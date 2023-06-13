@@ -15,7 +15,7 @@ defined( 'ABSPATH' ) || exit;
 // composer autoloading.
 require_once getenv( 'COMPOSER_AUTOLOAD_FILEPATH' );
 
-use Lasntg\Admin\Subscriptions\{ PluginUtils, SubscriptionActionsFilters, CustomMessages};
+use Lasntg\Admin\Subscriptions\{ PluginUtils, SubscriptionActionsFilters, CustomMessages, WP_Emails};
 use Lasntg\Admin\Subscriptions\OptionPages\{NationalManagerOptions, TrainingOfficersOptions, PrivateClientOptions, RegionalManagerOptions};
 use Lasntg\Admin\Subscriptions\SubscriptionPages\{SubscriptionsOptionPage, PrivateClientPage, RegionalManagerOptionPage};
 
@@ -30,3 +30,4 @@ PrivateClientOptions::init();
 CustomMessages::init();
 SubscriptionsOptionPage::init();
 PrivateClientPage::init();
+WP_Emails::init();
