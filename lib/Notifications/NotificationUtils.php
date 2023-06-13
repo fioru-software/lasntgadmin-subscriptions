@@ -49,20 +49,17 @@ class NotificationUtils {
 		}
 		$acf         = $_POST['acf']; //phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$course_type = sanitize_text_field( wp_unslash( $acf[ self::$course_acf ] ) );
-		$location    = sanitize_text_field( wp_unslash( $acf[ self::$location_acf ] ) );
 
 		$cat_id = $cat_ids[0];
 		foreach ( $users as $key => $user ) {
 			// check if user has any checked options.
 			// Category.
 			$in_mailing_category = SubscriptionManager::confirm_meta( $user->ID, $cat_id );
-			// Location.
-			$in_location = SubscriptionManager::confirm_meta( $user->ID, $location, 'location' );
 
 			// Event Type.
 			$in_course = SubscriptionManager::confirm_meta( $user->ID, $course_type, 'course_type' );
 
-			if ( ! $in_mailing_category || ! $in_location || ! $in_course ) {
+			if ( ! $in_mailing_category || ! $in_course ) {
 				// unset user from $users since they do not have any of the required options.
 				unset( $users[ $key ] );
 			}
