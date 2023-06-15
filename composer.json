@@ -1,6 +1,6 @@
 {
     "name": "fioru/lasntgadmin-subscriptions",
-    "version": "2.1.5",
+    "version": "2.1.6",
     "type": "wordpress-plugin",
     "extra": {
         "installer-name": "lasntgadmin-subscriptions"

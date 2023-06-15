@@ -23,7 +23,7 @@ class WP_Emails {
 		$key = get_password_reset_key( $user );
 
 		$message  = sprintf( __( '<h3>Hi %1$s %2$s,</h3>', 'lasntgadmin' ), $user->first_name, $user->last_name ) . "\r\n\r\n<br/>"; // phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
-		$message .= "You account has been created on <strong>LASNTG Online Booking System.</strong>.\r\n\r\n<br/>";
+		$message .= "Your account has been created on <strong>LASNTG Online Booking System.</strong>.\r\n\r\n<br/>";
 		$message .= sprintf( "Username - <strong>%s</strong> \r\n\r\n<br/>", $user->user_login );
 		$message .= sprintf( "Password - To set your password, please <a href=\"%s\"><strong>Click Here</strong></a> \r\n\r\n<br/>", network_site_url( "wp-login.php?action=rp&key=$key&login=" . rawurlencode( $user->user_login ), 'login' ) );
 		$message .= "<br/>\r\n\r\nFor assistance please contact help@veri.ie <br/>\r\n\r\n";
