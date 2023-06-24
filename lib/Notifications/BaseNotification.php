@@ -68,4 +68,27 @@ abstract class BaseNotification {
 		$users = NotificationUtils::get_users_in_group( $post_ID, static::$user_role );
 		NotificationUtils::parse_emails_for_users( $users, $subject, $body, $post_ID );
 	}
+
+	protected static function process_payment_link( $user, $post_ID, $link ) {
+		$email = NotificationUtils::get_email_subject_and_body( $post_ID, 'course_space_available_free_subject', 'course_space_available_free' );
+
+		if ( $email && $email['subject'] && $email['body'] ) {
+			$link    = "<a href='$link'>Click Here to view</a>";
+			$subject = str_replace( '{%payment-link%}', $link, $email['subject'] );
+			$body    = str_replace( '{%payment-link%}', $link, $email['body'] );
+			$subject = ParseEmail::add_receiver_info( $user, $subject, $post_ID );
+			$body    = ParseEmail::add_receiver_info( $user, $body, $post_ID );
+			$users   = [
+				$user,
+			];
+			NotificationUtils::parse_emails_for_users( $users, $subject, $body, $post_ID );
+			return true;
+		}
+		return false;
+	}
+
+	public static function space_available( $post_ID, $user, $link ) {
+		self::set_option_name();
+		self::process_payment_link( $user, $post_ID, $link );
+	}
 }

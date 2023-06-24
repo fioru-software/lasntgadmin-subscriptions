@@ -129,13 +129,13 @@ class Editors {
 	public static function status_set_to_enrolling_subject(): void {
 		self::add_text_field( 'status_set_to_enrolling_subject' );
 	}
-	/**
-	 * Status Set To Enrolling Subject.
-	 *
-	 * @return void
-	 */
+
 	public static function course_space_available_subject(): void {
 		self::add_text_field( 'course_space_available_subject' );
+	}
+
+	public static function course_space_available_free_subject(): void {
+		self::add_text_field( 'course_space_available_free_subject' );
 	}
 
 	/**
@@ -233,6 +233,10 @@ class Editors {
 	 */
 	public static function course_space_available(): void {
 		self::wp_editor( 'course_space_available' );
+	}
+
+	public static function course_space_available_free(): void {
+		self::wp_editor( 'course_space_available_free' );
 	}
 
 	/**
