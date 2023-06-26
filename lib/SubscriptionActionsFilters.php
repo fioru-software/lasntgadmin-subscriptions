@@ -39,6 +39,10 @@ class SubscriptionActionsFilters {
 		$items = $order->get_items( apply_filters( 'woocommerce_purchase_order_item_types', 'line_item' ) ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		foreach ( $items as $item ) {
 			$product_id = $item->get_product_id();
+
+			if ( ! ProductUtils::is_open_for_enrollment_by_product_id( $product_id ) ) {
+				continue;
+			}
 			self::process_group( $product_id );
 		}
 	}
@@ -57,6 +61,9 @@ class SubscriptionActionsFilters {
 		}
 	}
 	public static function save_post( $post_ID ) {
+		if ( ! ProductUtils::is_open_for_enrollment_by_product_id( $post_ID ) ) {
+			return;
+		}
 		$old_stock = get_post_meta( $post_ID, '_stock', true );
 		if ( ! isset( $_POST['_stock'] ) ) { //phpcs:ignore WordPress.Security.NonceVerification.Missing
 			return;
@@ -137,6 +144,9 @@ class SubscriptionActionsFilters {
 	}
 
 	public static function quotas_changed( $post_id, $group_id, $old_value, $new_value ) {
+		if ( ! ProductUtils::is_open_for_enrollment_by_product_id( $post_id ) ) {
+			return;
+		}
 		if ( '' == $new_value || (int) $new_value > (int) $old_value ) {
 			$quota = QuotaUtils::get_product_quota( $post_id, false, $group_id );
 			if ( $quota ) {
