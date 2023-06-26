@@ -132,11 +132,11 @@ class OptionPage {
 			'course_cancellation'                => __( 'Course Cancellation Body', 'lasntgadmin' ),
 
 		];
-		if ( $user_type == 1 ) {
+		if ( 1 == $user_type ) {
 			$fields ['course_space_available_subject'] = __( 'Waiting List changed to Pending Subject', 'lasntgadmin' );
 			$fields ['course_space_available']         = __( 'Waiting List changed to Pending Body', 'lasntgadmin' );
 		}
-		if ( $user_type == 1 || $user_type == 2 ) {
+		if ( 1 == $user_type || 2 == $user_type ) {
 			$fields ['course_space_available_free_subject'] = __( 'Course has space available Subject', 'lasntgadmin' );
 			$fields ['course_space_available_free']         = __( 'Course has space available Body', 'lasntgadmin' );
 		}

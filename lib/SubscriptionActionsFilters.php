@@ -19,28 +19,52 @@ class SubscriptionActionsFilters {
 		add_action( 'wp_ajax_lasntgadmin_subscribe', [ self::class, 'subscribe' ] );
 		add_action( 'admin_enqueue_scripts', [ self::class, 'admin_enqueue_scripts' ] );
 		add_action( 'woocommerce_order_status_changed', [ self::class, 'waiting_list_order_updated' ], 10, 3 );
-		add_action( 'lasntgadmin-products_quotas_field_changed', [ self::class, 'quotas_changed' ], 10, 4 );
 
+		add_action( 'lasntgadmin-products_quotas_field_changed', [ self::class, 'quotas_changed' ], 10, 4 );
 		add_action( 'save_post_product', [ self::class, 'save_post' ], 100 );
+		add_action( 'woocommerce_order_status_changed', [ self::class, 'order_cancelled', 10, 3 ] );
+	}
+
+	public static function order_cancelled( $order_id, $old_status, $new_status ) {
+		if ( 'cancelled' !== $new_status ) {
+			return;
+		}
+		if (
+			'pending' !== $old_status &&
+			'completed' !== $old_status
+		) {
+			return;
+		}
+		$order = wc_get_order( $order_id );
+		$items = $order->get_items( apply_filters( 'woocommerce_purchase_order_item_types', 'line_item' ) ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		foreach ( $items as $item ) {
+			$product_id = $item->get_product_id();
+			self::process_group( $product_id );
+		}
+	}
+
+	private static function process_group( $post_ID ) {
+		$groups  = GroupUtils::get_read_group_ids( $post_ID );
+		$allowed = [];
+		foreach ( $groups as $group_id ) {
+			$quota = QuotaUtils::get_product_quota( $post_ID, false, $group_id );
+			if ( '' === $quota || (int) $quota > 0 ) {
+				$allowed[] = $group_id;
+			}
+		}
+		if ( $allowed ) {
+			self::process_quotas_changed( $post_ID, $allowed );
+		}
 	}
 	public static function save_post( $post_ID ) {
 		$old_stock = get_post_meta( $post_ID, '_stock', true );
-		$new_stock = $_POST['_stock'];
+		if ( ! isset( $_POST['_stock'] ) ) { //phpcs:ignore WordPress.Security.NonceVerification.Missing
+			return;
+		}
+		$new_stock = sanitize_text_field( wp_unslash( $_POST['_stock'] ) ); //phpcs:ignore WordPress.Security.NonceVerification.Missing
 		if ( $old_stock ) {
 			update_post_meta( $post_ID, '_stock', $new_stock );
-			if ( $new_stock > $old_stock ) {
-				$groups  = GroupUtils::get_read_group_ids( $post_ID );
-				$allowed = [];
-				foreach ( $groups as $group_id ) {
-					$quota = QuotaUtils::get_product_quota( $post_ID, false, $group_id );
-					if ( '' === $quota || (int) $quota > 0 ) {
-						$allowed[] = $group_id;
-					}
-				}
-				if ( $allowed ) {
-					self::process_quotas_changed( $post_ID, $allowed );
-				}
-			}
+			self::process_group( $post_ID );
 		}
 	}
 
@@ -48,7 +72,7 @@ class SubscriptionActionsFilters {
 	public static function identify_product_change( $product ) {
 		$product_id = $product->get_id();
 		$old        = \wc_get_product( $product_id );
-		// get products
+
 		$old_stock = $old->get_stock_quantity();
 		$new_stock = $product->get_stock_quantity();
 		if ( $new_stock > $old_stock ) {
@@ -98,11 +122,11 @@ class SubscriptionActionsFilters {
 				}
 				$role = self::check_user_role( $user );
 
-				if ( $role == 'customer' ) {
+				if ( 'customer' == $role ) {
 					PrivateNotifications::space_available( $post_id, $user, get_permalink( $post_id ) );
 				}
 
-				if ( $role == 'training_officer' ) {
+				if ( 'training_officer' == $role ) {
 					$attendee_url = admin_url( 'post.php?post=' . $order->get_id() ) . '&action=edit&tab=attendees';
 					TrainingCenterNotifications::space_available( $post_id, $user, $attendee_url );
 				}
@@ -113,7 +137,7 @@ class SubscriptionActionsFilters {
 	}
 
 	public static function quotas_changed( $post_id, $group_id, $old_value, $new_value ) {
-		if ( $new_value == '' || (int) $new_value > (int) $old_value ) {
+		if ( '' == $new_value || (int) $new_value > (int) $old_value ) {
 			$quota = QuotaUtils::get_product_quota( $post_id, false, $group_id );
 			if ( $quota ) {
 				self::process_quotas_changed( $post_id, [ $group_id ] );
