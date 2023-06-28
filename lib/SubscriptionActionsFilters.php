@@ -25,7 +25,7 @@ class SubscriptionActionsFilters {
 		add_action( 'woocommerce_order_status_changed', [ self::class, 'order_cancelled', 10, 3 ] );
 	}
 
-	public static function order_cancelled( $order_id, $old_status, $new_status ) {
+	public static function order_cancelled( $order_id, $old_status, $new_status ): void {
 		if ( 'cancelled' !== $new_status ) {
 			return;
 		}
@@ -37,17 +37,24 @@ class SubscriptionActionsFilters {
 		}
 		$order = wc_get_order( $order_id );
 		$items = $order->get_items( apply_filters( 'woocommerce_purchase_order_item_types', 'line_item' ) ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-		foreach ( $items as $item ) {
-			$product_id = $item->get_product_id();
 
-			if ( ! ProductUtils::is_open_for_enrollment_by_product_id( $product_id ) ) {
-				continue;
-			}
-			self::process_group( $product_id );
+		$items_count = count( $items );
+
+		$item = $items[0];
+
+		$product_id = $item->get_product_id();
+		$product    = \wc_get_product( $product_id );
+		// check if the course had more empty spaces.
+		if ( $product->get_stock_quantity() > $items_count ) {
+			return;
 		}
+		if ( ! ProductUtils::is_open_for_enrollment_by_product_id( $product_id ) ) {
+			return;
+		}
+		self::process_group( $product_id );
 	}
 
-	private static function process_group( $post_ID ) {
+	private static function process_group( $post_ID ): void {
 		$groups  = GroupUtils::get_read_group_ids( $post_ID );
 		$allowed = [];
 		foreach ( $groups as $group_id ) {
@@ -69,10 +76,14 @@ class SubscriptionActionsFilters {
 			return;
 		}
 		$new_stock = sanitize_text_field( wp_unslash( $_POST['_stock'] ) ); //phpcs:ignore WordPress.Security.NonceVerification.Missing
-		if ( $old_stock ) {
-			update_post_meta( $post_ID, '_stock', $new_stock );
-			self::process_group( $post_ID );
+
+		if ( 0 < $old_stock || '' == $old_stock ) {
+			return;
 		}
+		$product = wc_get_product( $post_ID );
+		$product->set_stock_quantity( $new_stock );
+
+		self::process_group( $post_ID );
 	}
 
 
@@ -144,7 +155,10 @@ class SubscriptionActionsFilters {
 	}
 
 	public static function quotas_changed( $post_id, $group_id, $old_value, $new_value ) {
-		if ( ! ProductUtils::is_open_for_enrollment_by_product_id( $post_id ) ) {
+		if (
+			'' == $old_value
+			|| $old_value > 1
+			|| ! ProductUtils::is_open_for_enrollment_by_product_id( $post_id ) ) {
 			return;
 		}
 		if ( '' == $new_value || (int) $new_value > (int) $old_value ) {
@@ -178,15 +192,14 @@ class SubscriptionActionsFilters {
 		if ( 'waiting-list' !== $old_status && 'pending' !== $new_status ) {
 			return;
 		}
-		$order = wc_get_order( $order_id );
-		$items = $order->get_items( apply_filters( 'woocommerce_purchase_order_item_types', 'line_item' ) ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-		foreach ( $items as $item ) {
-			$product_id = $item->get_product_id();
-			$user_id    = $order->get_user_id();
-			if ( $user_id ) {
-				$user = get_user_by( 'ID', $user_id );
-				PrivateNotifications::space_available_waiting_list_pending( $product_id, $user, $order->get_checkout_payment_url() );
-			}
+		$order      = wc_get_order( $order_id );
+		$items      = $order->get_items( apply_filters( 'woocommerce_purchase_order_item_types', 'line_item' ) ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		$item       = $items[0];
+		$product_id = $item->get_product_id();
+		$user_id    = $order->get_user_id();
+		if ( $user_id ) {
+			$user = get_user_by( 'ID', $user_id );
+			PrivateNotifications::space_available_waiting_list_pending( $product_id, $user, $order->get_checkout_payment_url() );
 		}
 	}
 	public static function admin_enqueue_scripts() {
