@@ -77,7 +77,7 @@ class SubscriptionActionsFilters {
 		}
 		$new_stock = sanitize_text_field( wp_unslash( $_POST['_stock'] ) ); //phpcs:ignore WordPress.Security.NonceVerification.Missing
 
-		if ( 0 < $old_stock || '' == $old_stock ) {
+		if ( is_int( $old_stock ) && 0 < $old_stock ) {
 			return;
 		}
 		$product = wc_get_product( $post_ID );
