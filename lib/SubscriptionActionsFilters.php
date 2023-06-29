@@ -67,7 +67,8 @@ class SubscriptionActionsFilters {
 			self::process_quotas_changed( $post_ID, $allowed );
 		}
 	}
-	public static function save_post( $post_ID ) {
+
+	public static function save_post( $post_ID ): void {
 		if ( ! ProductUtils::is_open_for_enrollment_by_product_id( $post_ID ) ) {
 			return;
 		}
@@ -77,7 +78,7 @@ class SubscriptionActionsFilters {
 		}
 		$new_stock = sanitize_text_field( wp_unslash( $_POST['_stock'] ) ); //phpcs:ignore WordPress.Security.NonceVerification.Missing
 
-		if ( is_int( $old_stock ) && 0 < $old_stock ) {
+		if ( 0 < $old_stock ) {
 			return;
 		}
 		$product = wc_get_product( $post_ID );
@@ -87,7 +88,7 @@ class SubscriptionActionsFilters {
 	}
 
 
-	public static function identify_product_change( $product ) {
+	public static function identify_product_change( $product ): void {
 		$product_id = $product->get_id();
 		$old        = \wc_get_product( $product_id );
 
@@ -109,7 +110,7 @@ class SubscriptionActionsFilters {
 		}
 	}
 
-	private static function process_quotas_changed( $post_id, $groups_allowed ) {
+	private static function process_quotas_changed( $post_id, $groups_allowed ): void {
 		$orders = \wc_get_orders(
 			array(
 				'limit'   => -1,
@@ -119,8 +120,8 @@ class SubscriptionActionsFilters {
 			)
 		);
 
-			// make sure user doesn't get multiple notifications.
-			$user_ids = [];
+		// make sure user doesn't get multiple notifications.
+		$user_ids = [];
 		foreach ( $orders as $order ) {
 			$user_id = $order->get_user_id();
 
@@ -154,7 +155,7 @@ class SubscriptionActionsFilters {
 		}//end foreach
 	}
 
-	public static function quotas_changed( $post_id, $group_id, $old_value, $new_value ) {
+	public static function quotas_changed( $post_id, $group_id, $old_value, $new_value ): void {
 		if (
 			'' == $old_value
 			|| $old_value > 1
@@ -174,7 +175,7 @@ class SubscriptionActionsFilters {
 	 *
 	 * @todo should be moved to groups plugin.
 	 * @param  mixed $user WP_User.
-	 * @return bool
+	 * @return bool|string Returns role or false.
 	 */
 	private static function check_user_role( $user ) {
 		$roles        = (array) $user->roles;
@@ -188,7 +189,7 @@ class SubscriptionActionsFilters {
 	}
 
 
-	public static function waiting_list_order_updated( $order_id, $old_status, $new_status ) {
+	public static function waiting_list_order_updated( $order_id, $old_status, $new_status ): void {
 		if ( 'waiting-list' !== $old_status && 'pending' !== $new_status ) {
 			return;
 		}
@@ -202,7 +203,7 @@ class SubscriptionActionsFilters {
 			PrivateNotifications::space_available_waiting_list_pending( $product_id, $user, $order->get_checkout_payment_url() );
 		}
 	}
-	public static function admin_enqueue_scripts() {
+	public static function admin_enqueue_scripts(): void {
 		$screen = get_current_screen();
 		if ( $screen && 'edit-tags' === $screen->base ) {
 			$assets_dir = untrailingslashit( plugin_dir_url( __FILE__ ) ) . '/../assets/';
@@ -220,7 +221,7 @@ class SubscriptionActionsFilters {
 			);
 		}
 	}
-	public static function subscribe() {
+	public static function subscribe(): void {
 		check_ajax_referer( 'lasntgadmin-subscription-subscribe-nonce', 'security' );
 
 		if ( ! isset( $_POST['id'] ) ) {
@@ -241,7 +242,7 @@ class SubscriptionActionsFilters {
 			]
 		);
 	}
-	public static function add_subscription_link_to_woocommerce_category( $actions, $post ) {
+	public static function add_subscription_link_to_woocommerce_category( $actions, $post ): array {
 		if ( 'product_cat' !== $post->taxonomy ) {
 			return $actions;
 		}
