@@ -146,8 +146,9 @@ class SubscriptionActionsFilters {
 				}
 
 				if ( 'training_officer' == $role ) {
-					$attendee_url = admin_url( 'post.php?post=' . $order->get_id() ) . '&action=edit&tab=attendees';
-					TrainingCenterNotifications::space_available( $post_id, $user, $attendee_url );
+					$attendee_url = admin_url( 'post.php?post=' . $order->get_id() ) . '&action=edit&email_notification=1';
+					$nonce_url    = wp_nonce_url( $attendee_url, 'lasntgadmin-enrolment' );
+					TrainingCenterNotifications::space_available( $post_id, $user, $nonce_url );
 				}
 
 				$user_ids[] = $user_id;
