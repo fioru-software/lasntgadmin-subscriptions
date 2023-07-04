@@ -30,21 +30,22 @@ class SubscriptionActionsFilters {
 		add_action( 'admin_init', [ self::class, 'change_waiting_to_pending' ] );
 	}
 	/**
-		* to be moved to orders plugin.
+	 * To be moved to orders plugin.
 	 */
 	public static function change_waiting_to_pending() {
-		if ( ! isset( $_GET['email_notification'] ) || ! isset( $_GET['_wpnonce'] )
+		if ( ! isset( $_GET['email_notification'] )
 		|| ! isset( $_GET['post'] ) ) {
 			return;
 		}
-		$nonce = sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) );
-		if ( isset( $_GET['_wpnonce'] ) && ! wp_verify_nonce( $nonce, self::$action ) ) {
+		$post_id = sanitize_text_field( wp_unslash( $_GET['post'] ) );
+		$key     = sanitize_text_field( wp_unslash( $_GET['email_notification'] ) );
+
+		$post_key = get_post_meta( $post_id, self::$action, true );
+		if ( $key !== $post_key ) {
 			return;
 		}
-		$post_id = sanitize_text_field( wp_unslash( $_GET['post'] ) );
-		$order   = wc_get_order( $post_id );
-		$order->set_status( 'waiting-list' );
-		$order->save();
+		$order = wc_get_order( $post_id );
+
 		if ( ! $order->has_status( 'waiting-list' ) ) {
 			return;
 		}
@@ -173,9 +174,11 @@ class SubscriptionActionsFilters {
 				}
 
 				if ( 'training_officer' == $role ) {
-					$attendee_url = admin_url( 'post.php?post=' . $order->get_id() ) . '&action=edit&email_notification=1';
-					$nonce_url    = wp_nonce_url( $attendee_url, self::$action );
-					TrainingCenterNotifications::space_available( $post_id, $user, $nonce_url );
+					$nonce        = wp_generate_password( 12, false );
+					$attendee_url = admin_url( 'post.php?post=' . $order->get_id() ) . '&action=edit&email_notification=' . $nonce;
+
+					update_meta( $post_id, self::$action, $nonce );
+					TrainingCenterNotifications::space_available( $post_id, $user, $attendee_url );
 				}
 
 				$user_ids[] = $user_id;
