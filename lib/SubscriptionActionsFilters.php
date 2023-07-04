@@ -10,7 +10,7 @@ use Lasntg\Admin\Subscriptions\Notifications\TrainingCenterNotifications;
 use Lasntg\Admin\Subscriptions\SubscriptionPages\SubscriptionManager;
 
 class SubscriptionActionsFilters {
-
+	private static $action = 'lasntgadmin-enrolment';
 	public static function init(): void {
 		add_action( 'post_updated', [ self::class, 'post_updated' ], 999, 3 );
 		add_action( 'wp_insert_post', [ self::class, 'wp_insert_post' ], 1, 2 );
@@ -23,6 +23,31 @@ class SubscriptionActionsFilters {
 		add_action( 'lasntgadmin-products_quotas_field_changed', [ self::class, 'quotas_changed' ], 10, 4 );
 		add_action( 'save_post_product', [ self::class, 'save_post' ], 100 );
 		add_action( 'woocommerce_order_status_changed', [ self::class, 'order_cancelled', 10, 3 ] );
+
+		apply_filters( 'nonce_life', 86400*30, self::$action ); // 1 month.
+
+		add_action('admin_init', [self::class, 'change_waiting_to_pending']);
+
+	}
+
+	public static function change_waiting_to_pending()
+	{
+		if(!isset($_GET['email_notification'])){
+			return;
+		}
+		if(isset($_GET['_wpnonce']) && ! wp_verify_nonce( $_GET['_wpnonce'], self::$action ) ) {
+			return;
+		}
+		$post_id = $_GET['post'];
+		$order      = wc_get_order( $post_id );
+		$order->set_status('waiting-list');
+		$order->save();
+		if(! $order->has_status('waiting-list') ){
+			return;
+		}
+		$order->set_status('wc-attendees');
+		$order->save();
+
 	}
 
 	public static function order_cancelled( $order_id, $old_status, $new_status ): void {
@@ -147,7 +172,7 @@ class SubscriptionActionsFilters {
 
 				if ( 'training_officer' == $role ) {
 					$attendee_url = admin_url( 'post.php?post=' . $order->get_id() ) . '&action=edit&email_notification=1';
-					$nonce_url    = wp_nonce_url( $attendee_url, 'lasntgadmin-enrolment' );
+					$nonce_url    = wp_nonce_url( $attendee_url, self::$action );
 					TrainingCenterNotifications::space_available( $post_id, $user, $nonce_url );
 				}
 
@@ -191,7 +216,10 @@ class SubscriptionActionsFilters {
 
 
 	public static function waiting_list_order_updated( $order_id, $old_status, $new_status ): void {
-		if ( 'waiting-list' !== $old_status && 'pending' !== $new_status ) {
+		if ( 
+			'waiting-list' !== $old_status 
+			&& 'pending' !== $new_status 
+		) {
 			return;
 		}
 		$order      = wc_get_order( $order_id );
