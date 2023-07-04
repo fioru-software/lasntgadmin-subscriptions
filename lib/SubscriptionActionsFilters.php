@@ -24,30 +24,32 @@ class SubscriptionActionsFilters {
 		add_action( 'save_post_product', [ self::class, 'save_post' ], 100 );
 		add_action( 'woocommerce_order_status_changed', [ self::class, 'order_cancelled', 10, 3 ] );
 
-		apply_filters( 'nonce_life', 86400*30, self::$action ); // 1 month.
+		apply_filters( 'nonce_life', 86400 * 30, self::$action ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		// 1 month.
 
-		add_action('admin_init', [self::class, 'change_waiting_to_pending']);
-
+		add_action( 'admin_init', [ self::class, 'change_waiting_to_pending' ] );
 	}
-
-	public static function change_waiting_to_pending()
-	{
-		if(!isset($_GET['email_notification'])){
+	/**
+		* to be moved to orders plugin.
+	 */
+	public static function change_waiting_to_pending() {
+		if ( ! isset( $_GET['email_notification'] ) || ! isset( $_GET['_wpnonce'] )
+		|| ! isset( $_GET['post'] ) ) {
 			return;
 		}
-		if(isset($_GET['_wpnonce']) && ! wp_verify_nonce( $_GET['_wpnonce'], self::$action ) ) {
+		$nonce = sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) );
+		if ( isset( $_GET['_wpnonce'] ) && ! wp_verify_nonce( $nonce, self::$action ) ) {
 			return;
 		}
-		$post_id = $_GET['post'];
-		$order      = wc_get_order( $post_id );
-		$order->set_status('waiting-list');
+		$post_id = sanitize_text_field( wp_unslash( $_GET['post'] ) );
+		$order   = wc_get_order( $post_id );
+		$order->set_status( 'waiting-list' );
 		$order->save();
-		if(! $order->has_status('waiting-list') ){
+		if ( ! $order->has_status( 'waiting-list' ) ) {
 			return;
 		}
-		$order->set_status('wc-attendees');
+		$order->set_status( 'wc-attendees' );
 		$order->save();
-
 	}
 
 	public static function order_cancelled( $order_id, $old_status, $new_status ): void {
@@ -216,9 +218,8 @@ class SubscriptionActionsFilters {
 
 
 	public static function waiting_list_order_updated( $order_id, $old_status, $new_status ): void {
-		if ( 
-			'waiting-list' !== $old_status 
-			&& 'pending' !== $new_status 
+		if ( 'waiting-list' !== $old_status
+			&& 'pending' !== $new_status
 		) {
 			return;
 		}
