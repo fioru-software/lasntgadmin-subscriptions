@@ -24,9 +24,6 @@ class SubscriptionActionsFilters {
 		add_action( 'save_post_product', [ self::class, 'save_post' ], 100 );
 		add_action( 'woocommerce_order_status_changed', [ self::class, 'order_cancelled', 10, 3 ] );
 
-		apply_filters( 'nonce_life', 86400 * 30, self::$action ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-		// 1 month.
-
 		add_action( 'admin_init', [ self::class, 'change_waiting_to_pending' ] );
 	}
 	/**
@@ -37,10 +34,10 @@ class SubscriptionActionsFilters {
 		|| ! isset( $_GET['post'] ) ) {
 			return;
 		}
-		$post_id = sanitize_text_field( wp_unslash( $_GET['post'] ) );
-		$key     = sanitize_text_field( wp_unslash( $_GET['email_notification'] ) );
-
-		$post_key = get_post_meta( $post_id, self::$action, true );
+		$post_id  = sanitize_text_field( wp_unslash( $_GET['post'] ) );
+		$key      = sanitize_text_field( wp_unslash( $_GET['email_notification'] ) );
+		$user_id  = get_current_user_id();
+		$post_key = get_post_meta( $post_id, self::$action . "_$user_id", true );
 		if ( $key !== $post_key ) {
 			return;
 		}
@@ -177,7 +174,7 @@ class SubscriptionActionsFilters {
 					$nonce        = wp_generate_password( 12, false );
 					$attendee_url = admin_url( 'post.php?post=' . $order->get_id() ) . '&action=edit&email_notification=' . $nonce;
 
-					update_meta( $post_id, self::$action, $nonce );
+					update_post_meta( $order->get_id(), self::$action . "_$user_id", $nonce );
 					TrainingCenterNotifications::space_available( $post_id, $user, $attendee_url );
 				}
 
@@ -189,7 +186,6 @@ class SubscriptionActionsFilters {
 	public static function quotas_changed( $post_id, $group_id, $old_value, $new_value ): void {
 		if (
 			'' == $old_value
-			|| $old_value > 1
 			|| ! ProductUtils::is_open_for_enrollment_by_product_id( $post_id ) ) {
 			return;
 		}
@@ -222,7 +218,7 @@ class SubscriptionActionsFilters {
 
 	public static function waiting_list_order_updated( $order_id, $old_status, $new_status ): void {
 		if ( 'waiting-list' !== $old_status
-			&& 'pending' !== $new_status
+			|| 'pending' !== $new_status
 		) {
 			return;
 		}
