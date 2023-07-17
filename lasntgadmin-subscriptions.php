@@ -3,7 +3,7 @@
  * Plugin Name:       LASNTG Admin Subscriptions
  * Plugin URI:        https://github.com/fioru-software/lasntgadmin-subscriptions
  * Description:       Manages subscriptions to courses.
- * Version:           2.1.10-rc4
+ * Version:           2.1.10-rc5
  * Requires PHP:      7.2
  * Requires PHP:      7.2
  * Text Domain:       lasntgadmin
