@@ -108,6 +108,7 @@ class SubscriptionActionsFilters {
 		}
 		$product = wc_get_product( $post_ID );
 		$product->set_stock_quantity( $new_stock );
+		$product->save();
 
 		self::process_group( $post_ID );
 	}
@@ -229,7 +230,10 @@ class SubscriptionActionsFilters {
 		$user_id    = $order->get_user_id();
 		if ( $user_id ) {
 			$user = get_user_by( 'ID', $user_id );
-			PrivateNotifications::space_available_waiting_list_pending( $product_id, $user, $order->get_checkout_payment_url() );
+			$role = self::check_user_role( $user );
+			if ( 'customer' == $role ) {
+				PrivateNotifications::space_available_waiting_list_pending( $product_id, $user, $order->get_checkout_payment_url() );
+			}
 		}
 	}
 	public static function admin_enqueue_scripts(): void {
