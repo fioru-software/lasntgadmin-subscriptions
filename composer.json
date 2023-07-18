@@ -1,6 +1,6 @@
 {
     "name": "fioru/lasntgadmin-subscriptions",
-    "version": "2.1.6",
+    "version": "2.1.10-rc5",
     "type": "wordpress-plugin",
     "extra": {
         "installer-name": "lasntgadmin-subscriptions"
@@ -52,12 +52,12 @@
 
     "require": {
         "composer/installers": "~2.0",
-        "fioru/lasntgadmin-grant-funded-payment-gateway": "^1.0.8",
-        "fioru/lasntgadmin-attendees": "^3.1.0",
-        "fioru/lasntgadmin-products": "^5.4.0",
-        "fioru/lasntgadmin-users": "^3.0.2",
+        "fioru/lasntgadmin-grant-funded-payment-gateway": "^1.4.3",
+        "fioru/lasntgadmin-attendees": "^3.7",
+        "fioru/lasntgadmin-products": "^5.9.9",
+        "fioru/lasntgadmin-users": "^3.3.2",
         "fioru/lasntgadmin-orders": "^1.5",
-        "fioru/lasntgadmin-groups": "^1.1"
+        "fioru/lasntgadmin-groups": "^1.5.3"
     },
     "require-dev": {
         "fakerphp/faker": "^1.19",

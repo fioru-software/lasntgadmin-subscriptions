@@ -24,7 +24,7 @@ class TrainingOfficersOptions extends OptionPage {
 			static::$option_name
 		);
 
-		self::set_fields();
+		self::set_fields( 2 );
 	}
 	public static function section_info(): void {
 		?>
