@@ -65,20 +65,22 @@ class SubscriptionActionsFilters {
 		$order = wc_get_order( $order_id );
 		$items = $order->get_items( apply_filters( 'woocommerce_purchase_order_item_types', 'line_item' ) ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
-		$items_count = count( $items );
-
 		$item = array_shift( $items );
 
 		$product_id = $item->get_product_id();
 		$product    = \wc_get_product( $product_id );
-		// check if the course had more empty spaces.
-		if ( $product->get_stock_quantity() > $items_count ) {
+		
+		// check if the course had more empty spaces than the order quantity.
+		if ( $product->get_stock_quantity() > 0 ) {
 			return;
 		}
 		if ( ! ProductUtils::is_open_for_enrollment_by_product_id( $product_id ) ) {
 			return;
 		}
-		self::process_group( $product_id );
+		$allowed  = GroupUtils::get_read_group_ids( $product_id );
+		if ( $allowed ) {
+			self::process_quotas_changed( $product_id, $allowed );
+		}
 	}
 
 	private static function process_group( $post_ID ): void {
