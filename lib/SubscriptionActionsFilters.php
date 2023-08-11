@@ -3,6 +3,7 @@
 namespace Lasntg\Admin\Subscriptions;
 
 use Lasntg\Admin\Group\GroupUtils;
+use Lasntg\Admin\Orders\OrderUtils;
 use Lasntg\Admin\Products\ProductUtils;
 use Lasntg\Admin\Products\QuotaUtils;
 use Lasntg\Admin\Subscriptions\Notifications\PrivateNotifications;
@@ -18,6 +19,7 @@ class SubscriptionActionsFilters {
 
 		add_action( 'wp_ajax_lasntgadmin_subscribe', [ self::class, 'subscribe' ] );
 		add_action( 'admin_enqueue_scripts', [ self::class, 'admin_enqueue_scripts' ] );
+		add_action( 'woocommerce_order_status_changed', [ self::class, 'order_cancelled' ], 10, 3 );
 		add_action( 'woocommerce_order_status_changed', [ self::class, 'waiting_list_order_updated' ], 10, 3 );
 
 		add_action( 'lasntgadmin-products_quotas_field_changed', [ self::class, 'quotas_changed' ], 10, 4 );
@@ -65,7 +67,7 @@ class SubscriptionActionsFilters {
 
 		$items_count = count( $items );
 
-		$item = $items[0];
+		$item = array_shift( $items );
 
 		$product_id = $item->get_product_id();
 		$product    = \wc_get_product( $product_id );
@@ -221,6 +223,7 @@ class SubscriptionActionsFilters {
 		if ( 'waiting-list' !== $old_status
 			|| 'pending' !== $new_status
 		) {
+			self::order_cancelled( $order_id, $old_status, $new_status );
 			return;
 		}
 		$order      = wc_get_order( $order_id );
