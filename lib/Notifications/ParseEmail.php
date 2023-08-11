@@ -147,7 +147,7 @@ class ParseEmail {
 		);
 
 		$quotas = [];
-		
+
 		foreach ( $groups as $group ) {
 			$group_id      = $group->group_id;
 			$quota         = NotificationUtils::get_group_quotas( $post_ID, $group_id );
