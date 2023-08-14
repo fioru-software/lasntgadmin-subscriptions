@@ -57,7 +57,7 @@ class SubscriptionActionsFilters {
 			return;
 		}
 		if (
-			 'pending' !== $old_status && 'wc-hold' !== $old_status &&
+			'pending' !== $old_status && 'wc-hold' !== $old_status &&
 			'completed' !== $old_status
 		) {
 			return;
