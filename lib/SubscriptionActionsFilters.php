@@ -173,9 +173,7 @@ class SubscriptionActionsFilters {
 
 				if ( 'customer' == $role ) {
 					PrivateNotifications::space_available( $post_id, $user, get_permalink( $post_id ) );
-				}
-
-				else{
+				} else {
 					$nonce        = wp_generate_password( 12, false );
 					$attendee_url = admin_url( 'post.php?post=' . $order->get_id() ) . '&action=edit&email_notification=' . $nonce;
 

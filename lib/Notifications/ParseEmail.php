@@ -150,9 +150,9 @@ class ParseEmail {
 		$quotas = [];
 
 		foreach ( $groups as $group ) {
-			$group_id      = $group->group_id;
-			$quota         = QuotaUtils::get_product_quota( $post_ID, false, $group_id );
-			
+			$group_id = $group->group_id;
+			$quota    = QuotaUtils::get_product_quota( $post_ID, false, $group_id );
+
 			$administrator = in_array( 'administrator', $user->roles );
 
 			if ( $administrator ) {
