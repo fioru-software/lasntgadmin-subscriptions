@@ -57,7 +57,7 @@ class SubscriptionActionsFilters {
 			return;
 		}
 		if (
-			( 'pending' !== $old_status && 'wc-hold' !== $old_status ) &&
+			 'pending' !== $old_status && 'wc-hold' !== $old_status &&
 			'completed' !== $old_status
 		) {
 			return;
@@ -71,7 +71,7 @@ class SubscriptionActionsFilters {
 		$product    = \wc_get_product( $product_id );
 
 		// check if the course had more empty spaces than the order quantity.
-		if ( $product->get_stock_quantity() > 0 ) {
+		if ( $product->get_stock_quantity() - $item->get_quantity() > 0 ) {
 			return;
 		}
 		if ( ! ProductUtils::is_open_for_enrollment_by_product_id( $product_id ) ) {
