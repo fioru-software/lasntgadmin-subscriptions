@@ -64,7 +64,9 @@ class SubscriptionActionsFilters {
 		}
 		$order = wc_get_order( $order_id );
 		$items = $order->get_items( apply_filters( 'woocommerce_purchase_order_item_types', 'line_item' ) ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-
+		if ( ! $items ) {
+			return;
+		}
 		$item = array_shift( $items );
 
 		$product_id = $item->get_product_id();
@@ -226,9 +228,12 @@ class SubscriptionActionsFilters {
 			self::order_cancelled( $order_id, $old_status, $new_status );
 			return;
 		}
-		$order      = wc_get_order( $order_id );
-		$items      = $order->get_items( apply_filters( 'woocommerce_purchase_order_item_types', 'line_item' ) ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-		$item       = $items[0];
+		$order = wc_get_order( $order_id );
+		$items = $order->get_items( apply_filters( 'woocommerce_purchase_order_item_types', 'line_item' ) ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		if ( ! $items ) {
+			return;
+		}
+		$item       = array_shift( $items );
 		$product_id = $item->get_product_id();
 		$user_id    = $order->get_user_id();
 		if ( $user_id ) {
