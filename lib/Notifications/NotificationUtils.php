@@ -2,6 +2,7 @@
 
 namespace Lasntg\Admin\Subscriptions\Notifications;
 
+use Lasntg\Admin\Group\GroupUtils;
 use Lasntg\Admin\Subscriptions\OptionPages\Editors;
 use Lasntg\Admin\Subscriptions\SubscriptionPages\SubscriptionManager;
 
@@ -14,9 +15,10 @@ class NotificationUtils {
 	 */
 	public static function get_post_group_ids( $post_ID ) {
 		// this is of the assumption it's the current group.
-		return isset( $_POST['groups-read'] ) //phpcs:ignore WordPress.Security.NonceVerification.Missing
-			? (array) array_map( 'sanitize_text_field', wp_unslash( $_POST['groups-read'] ) ) //phpcs:ignore WordPress.Security.NonceVerification.Missing
-			: \Groups_Post_Access::get_read_group_ids( $post_ID );
+		if ( ! isset( $_POST['groups-read'] ) ) { //phpcs:ignore WordPress.Security.NonceVerification.Missing
+			return GroupUtils::get_read_group_ids( $post_ID );
+		}
+		return (array) array_map( 'sanitize_text_field', wp_unslash( $_POST['groups-read'] ) ); //phpcs:ignore WordPress.Security.NonceVerification.Missing
 	}
 
 	/**

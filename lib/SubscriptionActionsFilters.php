@@ -3,6 +3,7 @@
 namespace Lasntg\Admin\Subscriptions;
 
 use Lasntg\Admin\Group\GroupUtils;
+use Lasntg\Admin\Orders\OrderUtils;
 use Lasntg\Admin\Products\ProductUtils;
 use Lasntg\Admin\Products\QuotaUtils;
 use Lasntg\Admin\Subscriptions\Notifications\PrivateNotifications;
@@ -18,6 +19,7 @@ class SubscriptionActionsFilters {
 
 		add_action( 'wp_ajax_lasntgadmin_subscribe', [ self::class, 'subscribe' ] );
 		add_action( 'admin_enqueue_scripts', [ self::class, 'admin_enqueue_scripts' ] );
+		add_action( 'woocommerce_order_status_changed', [ self::class, 'order_cancelled' ], 10, 3 );
 		add_action( 'woocommerce_order_status_changed', [ self::class, 'waiting_list_order_updated' ], 10, 3 );
 
 		add_action( 'lasntgadmin-products_quotas_field_changed', [ self::class, 'quotas_changed' ], 10, 4 );
@@ -55,7 +57,7 @@ class SubscriptionActionsFilters {
 			return;
 		}
 		if (
-			'pending' !== $old_status &&
+			'pending' !== $old_status && 'on-hold' !== $old_status &&
 			'completed' !== $old_status
 		) {
 			return;
@@ -63,20 +65,22 @@ class SubscriptionActionsFilters {
 		$order = wc_get_order( $order_id );
 		$items = $order->get_items( apply_filters( 'woocommerce_purchase_order_item_types', 'line_item' ) ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
-		$items_count = count( $items );
-
-		$item = $items[0];
+		$item = array_shift( $items );
 
 		$product_id = $item->get_product_id();
 		$product    = \wc_get_product( $product_id );
-		// check if the course had more empty spaces.
-		if ( $product->get_stock_quantity() > $items_count ) {
+
+		// check if the course had more empty spaces than the order quantity.
+		if ( $product->get_stock_quantity() - $item->get_quantity() > 0 ) {
 			return;
 		}
 		if ( ! ProductUtils::is_open_for_enrollment_by_product_id( $product_id ) ) {
 			return;
 		}
-		self::process_group( $product_id );
+		$allowed = GroupUtils::get_read_group_ids( $product_id );
+		if ( $allowed ) {
+			self::process_quotas_changed( $product_id, $allowed );
+		}
 	}
 
 	private static function process_group( $post_ID ): void {
@@ -169,9 +173,7 @@ class SubscriptionActionsFilters {
 
 				if ( 'customer' == $role ) {
 					PrivateNotifications::space_available( $post_id, $user, get_permalink( $post_id ) );
-				}
-
-				if ( 'training_officer' == $role ) {
+				} else {
 					$nonce        = wp_generate_password( 12, false );
 					$attendee_url = admin_url( 'post.php?post=' . $order->get_id() ) . '&action=edit&email_notification=' . $nonce;
 
@@ -221,6 +223,7 @@ class SubscriptionActionsFilters {
 		if ( 'waiting-list' !== $old_status
 			|| 'pending' !== $new_status
 		) {
+			self::order_cancelled( $order_id, $old_status, $new_status );
 			return;
 		}
 		$order      = wc_get_order( $order_id );
