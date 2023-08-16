@@ -64,13 +64,9 @@ class SubscriptionActionsFilters {
 		}
 		$order = wc_get_order( $order_id );
 		$items = $order->get_items( apply_filters( 'woocommerce_purchase_order_item_types', 'line_item' ) ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-<<<<<<< HEAD
-
-=======
 		if ( ! $items ) {
 			return;
 		}
->>>>>>> master
 		$item = array_shift( $items );
 
 		$product_id = $item->get_product_id();
