@@ -141,9 +141,19 @@ class SubscriptionActionsFilters {
 			}
 		}
 	}
+	private static function get_groups_quotas( $groups_allowed, $product_id ) {
+		$groups_quotas = [];
+		foreach ( $groups_allowed as $group_id ) {
+			$quota = QuotaUtils::get_product_quota( $product_id, false, $group_id );
+			if ( $quota > 0 ) {
+				$groups_quotas[ $group_id ] = $quota;
+			}
+		}
+		return $groups_quotas;
+	}
 
 	private static function process_quotas_changed( $post_id, $groups_allowed ): void {
-		$orders = \wc_get_orders(
+		$orders       = \wc_get_orders(
 			array(
 				'limit'   => -1,
 				'type'    => 'shop_order',
@@ -151,7 +161,7 @@ class SubscriptionActionsFilters {
 				'post_id' => array( $post_id ),
 			)
 		);
-
+		$group_quotas = self::get_groups_quotas( $groups_allowed, $post_id );
 		// make sure user doesn't get multiple notifications.
 		$user_ids = [];
 		foreach ( $orders as $order ) {
@@ -161,9 +171,16 @@ class SubscriptionActionsFilters {
 				if ( in_array( $user_id, $user_ids ) ) {
 					continue;
 				}
-				$user = get_user_by( 'ID', $user_id );
-				// todo be cleaned up after bug fix.
+				$user          = get_user_by( 'ID', $user_id );
+				$role          = self::check_user_role( $user );
+				$allowed_roles = [ 'training_officer', 'customer' ];
+				if ( ! in_array( $role, $allowed_roles ) ) {
+					continue;
+				}
+
 				$groups_user = new \Groups_User( $user_id );
+
+				// todo be cleaned up after bug fix.
 				$user_groups = $groups_user->group_ids;
 				$allowed     = array_intersect( $user_groups, $groups_allowed );
 
@@ -171,7 +188,13 @@ class SubscriptionActionsFilters {
 					$user_ids[] = $user_id;
 					continue;
 				}
-				$role = self::check_user_role( $user );
+
+				$quotas = array_intersect( $group_quotas, $allowed );
+
+				if ( ! $quotas ) {
+					$user_ids[] = $user_id;
+					continue;
+				}
 
 				if ( 'customer' == $role ) {
 					PrivateNotifications::space_available( $post_id, $user, get_permalink( $post_id ) );
