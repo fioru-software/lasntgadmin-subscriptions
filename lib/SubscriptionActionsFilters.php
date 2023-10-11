@@ -53,6 +53,7 @@ class SubscriptionActionsFilters {
 	}
 
 	public static function order_cancelled( $order_id, $old_status, $new_status ): void {
+
 		if ( 'cancelled' !== $new_status ) {
 			return;
 		}
@@ -64,6 +65,7 @@ class SubscriptionActionsFilters {
 		}
 		$order = wc_get_order( $order_id );
 		$items = $order->get_items( apply_filters( 'woocommerce_purchase_order_item_types', 'line_item' ) ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
 		if ( ! $items ) {
 			return;
 		}
@@ -71,7 +73,6 @@ class SubscriptionActionsFilters {
 
 		$product_id = $item->get_product_id();
 		$product    = \wc_get_product( $product_id );
-
 		// check if the course had more empty spaces than the order quantity.
 		if ( $product->get_stock_quantity() - $item->get_quantity() > 0 ) {
 			return;
@@ -162,6 +163,7 @@ class SubscriptionActionsFilters {
 			)
 		);
 		$group_quotas = self::get_groups_quotas( $groups_allowed, $post_id );
+
 		// make sure user doesn't get multiple notifications.
 		$user_ids = [];
 		foreach ( $orders as $order ) {
@@ -174,14 +176,12 @@ class SubscriptionActionsFilters {
 				$user          = get_user_by( 'ID', $user_id );
 				$role          = self::check_user_role( $user );
 				$allowed_roles = [ 'training_officer', 'customer' ];
+
 				if ( ! in_array( $role, $allowed_roles ) ) {
 					continue;
 				}
 
-				$groups_user = new \Groups_User( $user_id );
-
-				// todo be cleaned up after bug fix.
-				$user_groups = $groups_user->group_ids;
+				$user_groups = GroupUtils::get_group_ids_by_user_id( $user_id );
 				$allowed     = array_intersect( $user_groups, $groups_allowed );
 
 				if ( ! $allowed ) {
@@ -189,7 +189,7 @@ class SubscriptionActionsFilters {
 					continue;
 				}
 
-				$quotas = array_intersect( $group_quotas, $allowed );
+				$quotas = array_intersect( array_keys( $group_quotas ), $allowed );
 
 				if ( ! $quotas ) {
 					$user_ids[] = $user_id;
