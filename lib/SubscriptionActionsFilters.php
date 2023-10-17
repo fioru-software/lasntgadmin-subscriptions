@@ -176,20 +176,13 @@ class SubscriptionActionsFilters {
 				}
 
 				$user_groups = GroupUtils::get_group_ids_by_user_id( $user_id );
-				$allowed     = array_intersect( $user_groups, $groups_allowed );
+				$allowed     = array_intersect( $user_groups, $group_quotas );
 
 				if ( ! $allowed ) {
 					$user_ids[] = $user_id;
 					continue;
 				}
-
-				$quotas = array_intersect( array_keys( $group_quotas ), $allowed );
-
-				if ( ! $quotas ) {
-					$user_ids[] = $user_id;
-					continue;
-				}
-
+				
 				if ( 'customer' == $role ) {
 					PrivateNotifications::space_available( $post_id, $user, get_permalink( $post_id ) );
 				} else {
