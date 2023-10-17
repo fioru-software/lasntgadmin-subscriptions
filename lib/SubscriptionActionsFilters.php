@@ -154,19 +154,13 @@ class SubscriptionActionsFilters {
 	}
 
 	private static function process_quotas_changed( $post_id, $groups_allowed ): void {
-		$orders       = \wc_get_orders(
-			array(
-				'limit'   => -1,
-				'type'    => 'shop_order',
-				'status'  => array( 'wc-waiting-list' ),
-				'post_id' => array( $post_id ),
-			)
-		);
+		$order_ids    = ProductUtils::get_orders_ids_by_product_id( $post_id, [ 'wc-waiting-list' ] );
 		$group_quotas = self::get_groups_quotas( $groups_allowed, $post_id );
 
 		// make sure user doesn't get multiple notifications.
 		$user_ids = [];
-		foreach ( $orders as $order ) {
+		foreach ( $order_ids as $order_id ) {
+			$order   = wc_get_order( $order_id );
 			$user_id = $order->get_user_id();
 
 			if ( $user_id ) {
