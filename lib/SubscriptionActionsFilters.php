@@ -72,17 +72,21 @@ class SubscriptionActionsFilters {
 		$item = array_shift( $items );
 
 		$product_id = $item->get_product_id();
-		$product    = \wc_get_product( $product_id );
+		$order_groups = GroupUtils::get_read_group_ids( $order_id );
+		$group_quotas = self::get_groups_quotas( $order_groups, $product_id );
+		$sum = 0;
+		foreach($group_quotas as $group_quota){
+			$sum += $group_quota;
+		}
 		// check if the course had more empty spaces than the order quantity.
-		if ( $product->get_stock_quantity() - $item->get_quantity() > 0 ) {
+		if ( $sum - $item->get_quantity() > 0 ) {
 			return;
 		}
 		if ( ! ProductUtils::is_open_for_enrollment_by_product_id( $product_id ) ) {
 			return;
 		}
-		$allowed = GroupUtils::get_read_group_ids( $product_id );
-		if ( $allowed ) {
-			self::process_quotas_changed( $product_id, $allowed );
+		if ( $order_groups ) {
+			self::process_quotas_changed( $product_id, $order_groups );
 		}
 	}
 
@@ -175,8 +179,8 @@ class SubscriptionActionsFilters {
 					continue;
 				}
 
-				$user_groups = GroupUtils::get_group_ids_by_user_id( $user_id );
-				$allowed     = array_intersect( $user_groups, array_keys( $group_quotas ) );
+				$order_groups = GroupUtils::get_read_group_ids( $order_id );
+				$allowed     = array_intersect( $order_groups, array_keys( $group_quotas ) );
 
 				if ( ! $allowed ) {
 					$user_ids[] = $user_id;
