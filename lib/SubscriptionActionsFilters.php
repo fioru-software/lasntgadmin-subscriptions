@@ -53,6 +53,7 @@ class SubscriptionActionsFilters {
 	}
 
 	public static function order_cancelled( $order_id, $old_status, $new_status ): void {
+
 		if ( 'cancelled' !== $new_status ) {
 			return;
 		}
@@ -64,6 +65,7 @@ class SubscriptionActionsFilters {
 		}
 		$order = wc_get_order( $order_id );
 		$items = $order->get_items( apply_filters( 'woocommerce_purchase_order_item_types', 'line_item' ) ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
 		if ( ! $items ) {
 			return;
 		}
@@ -71,7 +73,6 @@ class SubscriptionActionsFilters {
 
 		$product_id = $item->get_product_id();
 		$product    = \wc_get_product( $product_id );
-
 		// check if the course had more empty spaces than the order quantity.
 		if ( $product->get_stock_quantity() - $item->get_quantity() > 0 ) {
 			return;
@@ -141,37 +142,46 @@ class SubscriptionActionsFilters {
 			}
 		}
 	}
+	private static function get_groups_quotas( $groups_allowed, $product_id ) {
+		$groups_quotas = [];
+		foreach ( $groups_allowed as $group_id ) {
+			$quota = QuotaUtils::get_product_quota( $product_id, false, $group_id );
+			if ( $quota > 0 ) {
+				$groups_quotas[ $group_id ] = $quota;
+			}
+		}
+		return $groups_quotas;
+	}
 
 	private static function process_quotas_changed( $post_id, $groups_allowed ): void {
-		$orders = \wc_get_orders(
-			array(
-				'limit'   => -1,
-				'type'    => 'shop_order',
-				'status'  => array( 'wc-waiting-list' ),
-				'post_id' => array( $post_id ),
-			)
-		);
+		$order_ids    = ProductUtils::get_orders_ids_by_product_id( $post_id, [ 'wc-waiting-list' ] );
+		$group_quotas = self::get_groups_quotas( $groups_allowed, $post_id );
 
 		// make sure user doesn't get multiple notifications.
 		$user_ids = [];
-		foreach ( $orders as $order ) {
+		foreach ( $order_ids as $order_id ) {
+			$order   = wc_get_order( $order_id );
 			$user_id = $order->get_user_id();
 
 			if ( $user_id ) {
 				if ( in_array( $user_id, $user_ids ) ) {
 					continue;
 				}
-				$user = get_user_by( 'ID', $user_id );
-				// todo be cleaned up after bug fix.
-				$groups_user = new \Groups_User( $user_id );
-				$user_groups = $groups_user->group_ids;
-				$allowed     = array_intersect( $user_groups, $groups_allowed );
+				$user          = get_user_by( 'ID', $user_id );
+				$role          = self::check_user_role( $user );
+				$allowed_roles = [ 'training_officer', 'customer' ];
+
+				if ( ! in_array( $role, $allowed_roles ) ) {
+					continue;
+				}
+
+				$user_groups = GroupUtils::get_group_ids_by_user_id( $user_id );
+				$allowed     = array_intersect( $user_groups, array_keys( $group_quotas ) );
 
 				if ( ! $allowed ) {
 					$user_ids[] = $user_id;
 					continue;
 				}
-				$role = self::check_user_role( $user );
 
 				if ( 'customer' == $role ) {
 					PrivateNotifications::space_available( $post_id, $user, get_permalink( $post_id ) );

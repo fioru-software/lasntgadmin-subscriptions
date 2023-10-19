@@ -73,7 +73,8 @@ class OptionPage {
 		return static::$option_name;
 	}
 
-	public static function load_page_content(): void {            ?>
+	public static function load_page_content(): void {
+		?>
 		<form method="post" action="options.php">
 			<?php
 			settings_fields( static::$option_name );

@@ -49,7 +49,7 @@ class Capabilities {
 		$caps = self::get_administrator_capabilities();
 		array_walk(
 			$caps,
-			function( $cap ) use ( $role ) {
+			function ( $cap ) use ( $role ) {
 				$role->add_cap( $cap );
 			}
 		);
@@ -58,7 +58,7 @@ class Capabilities {
 		$caps = self::get_national_manager_capabilities();
 		array_walk(
 			$caps,
-			function( $cap ) use ( $role ) {
+			function ( $cap ) use ( $role ) {
 				$role->add_cap( $cap );
 			}
 		);
@@ -67,7 +67,7 @@ class Capabilities {
 		$caps = self::get_regional_training_centre_manager_capabilities();
 		array_walk(
 			$caps,
-			function( $cap ) use ( $role ) {
+			function ( $cap ) use ( $role ) {
 				$role->add_cap( $cap );
 			}
 		);
@@ -76,7 +76,7 @@ class Capabilities {
 		$caps = self::get_training_officer_capabilities();
 		array_walk(
 			$caps,
-			function( $cap ) use ( $role ) {
+			function ( $cap ) use ( $role ) {
 				$role->add_cap( $cap );
 			}
 		);
@@ -85,7 +85,7 @@ class Capabilities {
 		$caps = self::get_fire_training_officer_capabilities();
 		array_walk(
 			$caps,
-			function( $cap ) use ( $role ) {
+			function ( $cap ) use ( $role ) {
 				$role->add_cap( $cap );
 			}
 		);
@@ -96,7 +96,7 @@ class Capabilities {
 		$caps = self::get_administrator_capabilities();
 		array_walk(
 			$caps,
-			function( $cap ) use ( $role ) {
+			function ( $cap ) use ( $role ) {
 				$role->remove_cap( $cap );
 			}
 		);
@@ -105,7 +105,7 @@ class Capabilities {
 		$caps = self::get_national_manager_capabilities();
 		array_walk(
 			$caps,
-			function( $cap ) use ( $role ) {
+			function ( $cap ) use ( $role ) {
 				$role->remove_cap( $cap );
 			}
 		);
@@ -114,7 +114,7 @@ class Capabilities {
 		$caps = self::get_regional_training_centre_manager_capabilities();
 		array_walk(
 			$caps,
-			function( $cap ) use ( $role ) {
+			function ( $cap ) use ( $role ) {
 				$role->remove_cap( $cap );
 			}
 		);
@@ -123,7 +123,7 @@ class Capabilities {
 		$caps = self::get_training_officer_capabilities();
 		array_walk(
 			$caps,
-			function( $cap ) use ( $role ) {
+			function ( $cap ) use ( $role ) {
 				$role->remove_cap( $cap );
 			}
 		);
@@ -132,7 +132,7 @@ class Capabilities {
 		$caps = self::get_fire_training_officer_capabilities();
 		array_walk(
 			$caps,
-			function( $cap ) use ( $role ) {
+			function ( $cap ) use ( $role ) {
 				$role->remove_cap( $cap );
 			}
 		);
