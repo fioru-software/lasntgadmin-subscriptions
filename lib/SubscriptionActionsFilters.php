@@ -2,6 +2,7 @@
 
 namespace Lasntg\Admin\Subscriptions;
 
+use DateTime;
 use Lasntg\Admin\Group\GroupUtils;
 use Lasntg\Admin\Orders\OrderUtils;
 use Lasntg\Admin\Products\ProductUtils;
@@ -11,6 +12,7 @@ use Lasntg\Admin\Subscriptions\Notifications\TrainingCenterNotifications;
 use Lasntg\Admin\Subscriptions\SubscriptionPages\SubscriptionManager;
 
 class SubscriptionActionsFilters {
+
 	private static $action = 'lasntgadmin-enrolment';
 	public static function init(): void {
 		add_action( 'post_updated', [ self::class, 'post_updated' ], 999, 3 );
@@ -32,8 +34,10 @@ class SubscriptionActionsFilters {
 	 * To be moved to orders plugin.
 	 */
 	public static function change_waiting_to_pending() {
-		if ( ! isset( $_GET['email_notification'] )
-		|| ! isset( $_GET['post'] ) ) {
+		if (
+			! isset( $_GET['email_notification'] )
+			|| ! isset( $_GET['post'] )
+		) {
 			return;
 		}
 		$post_id  = sanitize_text_field( wp_unslash( $_GET['post'] ) );
@@ -78,6 +82,7 @@ class SubscriptionActionsFilters {
 		foreach($group_quotas as $group_quota){
 			$sum += $group_quota;
 		}
+		$product    = \wc_get_product( $product_id );
 		// check if the course had more empty spaces than the order quantity.
 		if ( $sum - $item->get_quantity() > 0 ) {
 			return;
@@ -179,8 +184,8 @@ class SubscriptionActionsFilters {
 					continue;
 				}
 
-				$order_groups = GroupUtils::get_read_group_ids( $order_id );
-				$allowed     = array_intersect( $order_groups, array_keys( $group_quotas ) );
+				$user_groups = GroupUtils::get_group_ids_by_user_id( $user_id );
+				$allowed     = array_intersect( $user_groups, array_keys( $group_quotas ) );
 
 				if ( ! $allowed ) {
 					$user_ids[] = $user_id;
@@ -205,7 +210,8 @@ class SubscriptionActionsFilters {
 	public static function quotas_changed( $post_id, $group_id, $old_value, $new_value ): void {
 		if (
 			'' == $old_value
-			|| ! ProductUtils::is_open_for_enrollment_by_product_id( $post_id ) ) {
+			|| ! ProductUtils::is_open_for_enrollment_by_product_id( $post_id )
+		) {
 			return;
 		}
 		if ( '' == $new_value || (int) $new_value > (int) $old_value ) {
@@ -236,7 +242,8 @@ class SubscriptionActionsFilters {
 
 
 	public static function waiting_list_order_updated( $order_id, $old_status, $new_status ): void {
-		if ( 'waiting-list' !== $old_status
+		if (
+			'waiting-list' !== $old_status
 			|| 'pending' !== $new_status
 		) {
 			self::order_cancelled( $order_id, $old_status, $new_status );
@@ -337,7 +344,22 @@ class SubscriptionActionsFilters {
 			// do not send notifications for drafts or cancelled.
 			return $post_ID;
 		}//end if
-		Notifications::course_updated( $post_ID );
+
+		if ( ProductUtils::$publish_status !== $post_after->post_status ) {
+			return $post_ID;
+		}
+		$new_location = isset( $_POST['acf'] ) && isset( $_POST['acf']['field_63881b84798a5'] ) ? sanitize_text_field( wp_unslash( $_POST['acf']['field_63881b84798a5'] ) ) : false; //phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$old_location = get_field( 'field_63881b84798a5', $post_ID );
+
+		$new_start_date = isset( $_POST['acf'] ) && isset( $_POST['acf']['field_63881aee31478'] ) ? sanitize_text_field( wp_unslash( $_POST['acf']['field_63881aee31478'] ) ) : false; //phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$old_start_date = get_field( 'field_63881aee31478', $post_ID );
+
+		$date1 = \DateTime::createFromFormat( 'd/m/Y', $old_start_date );
+		$date2 = \DateTime::createFromFormat( 'Ymd', $new_start_date );
+
+		if ( $new_location !== $old_location || $date1 != $date2 ) {
+			Notifications::course_updated( $post_ID );
+		}
 		return $post_ID;
 	}
 

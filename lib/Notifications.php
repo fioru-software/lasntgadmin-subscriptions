@@ -47,12 +47,14 @@ class Notifications {
 		PrivateNotifications::course_updated( $post_ID );
 	}
 	public static function course_status_change( $post_ID ): void {
+		return;
 		TrainingCenterNotifications::status_changed( $post_ID );
 		ManagersNotifications::status_changed( $post_ID );
 		RegionalManagerNotifications::status_changed( $post_ID );
 		PrivateNotifications::status_changed( $post_ID );
 	}
 	public static function open_for_enrollment( $post_ID ): void {
+		return;
 		TrainingCenterNotifications::open_for_enrollment( $post_ID );
 		ManagersNotifications::open_for_enrollment( $post_ID );
 		RegionalManagerNotifications::open_for_enrollment( $post_ID );
