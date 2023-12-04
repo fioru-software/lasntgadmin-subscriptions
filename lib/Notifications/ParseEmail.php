@@ -90,7 +90,7 @@ class ParseEmail {
 			'trainer_email'            => $acf_fields['field_63881ce6f4456'],
 			'training_provider'        => $acf_fields['field_63881cf7f4457'],
 			'training_aim'             => $acf_fields['field_6387890fd6a25'],
-			'award'                    => $acf_fields['field_63881d74f445a'],
+			'award'                    => isset($acf_fields['field_63881d74f445a'])? $acf_fields['field_63881d74f445a']: '',
 			'applicable_regulation'    => $acf_fields['field_63878939d6a27'],
 			'primary_target_grade'     => $acf_fields['field_63881f7f3e5af'],
 			'other_grades_applicable'  => $acf_fields['field_638820173e5b0'],
@@ -151,7 +151,7 @@ class ParseEmail {
 		);
 
 		$quotas = [];
-
+		$user = get_userdata( $user->ID );
 		foreach ( $groups as $group ) {
 			$group_id = $group->group_id;
 			$quota    = QuotaUtils::get_product_quota( $post_ID, false, $group_id );
