@@ -317,7 +317,7 @@ class NotificationUtils {
 	public static function send_mail( $email, $subject, $body ): bool {
 		$headers = array( 'Content-Type: text/html; charset=UTF-8' );
 
-		$body .=  '<p>Please log in to the LASNTG Dashboard to see details - <strong><a href="https://lasntgadmin.veri.ie/wp-admin/" target="_blank" rel="noopener">LASNTG OBS login</a></strong></p>
+		$body .= '<p>Please log in to the LASNTG Dashboard to see details - <strong><a href="https://lasntgadmin.veri.ie/wp-admin/" target="_blank" rel="noopener">LASNTG OBS login</a></strong></p>
 <p>Best regards,</p>
 <p>LASNTG Automated Notifications<br/></p>
 <img src="cid:lasntg-logo" width="300" height="400">';

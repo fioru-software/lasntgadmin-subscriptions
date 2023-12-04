@@ -32,17 +32,16 @@ class SubscriptionActionsFilters {
 		add_action( 'phpmailer_init', [ self::class, 'add_logo_to_mail' ] );
 	}
 
-	public static function add_logo_to_mail(&$phpmailer)
-	{
+	public static function add_logo_to_mail( &$phpmailer ) {
 
 		$assets_dir = untrailingslashit( plugin_dir_url( __FILE__ ) ) . '/../assets/';
 
-		$file = $assets_dir . 'img/logo.png'; //phpmailer will load this file
-		$uid = 'lasntg-logo'; //will map it to this UID
-		$name = 'logo.png'; //this will be the file name for the attachment
+		$file = $assets_dir . 'img/logo.png';
+		$uid = 'lasntg-logo';
+		$name = 'logo.png';
 
-		$phpmailer->SMTPKeepAlive = true;
-    	$phpmailer->AddEmbeddedImage($file, $uid, $name);
+		$phpmailer->SMTPKeepAlive = true; //phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+		$phpmailer->AddEmbeddedImage( $file, $uid, $name );
 	}
 	/**
 	 * To be moved to orders plugin.
@@ -89,14 +88,14 @@ class SubscriptionActionsFilters {
 		}
 		$item = array_shift( $items );
 
-		$product_id = $item->get_product_id();
+		$product_id   = $item->get_product_id();
 		$order_groups = GroupUtils::get_read_group_ids( $order_id );
 		$group_quotas = self::get_groups_quotas( $order_groups, $product_id );
-		$sum = 0;
-		foreach($group_quotas as $group_quota){
+		$sum          = 0;
+		foreach ( $group_quotas as $group_quota ) {
 			$sum += $group_quota;
 		}
-		$product    = \wc_get_product( $product_id );
+		$product = \wc_get_product( $product_id );
 		// check if the course had more empty spaces than the order quantity.
 		if ( $sum - $item->get_quantity() > 0 ) {
 			return;
@@ -114,7 +113,7 @@ class SubscriptionActionsFilters {
 		$allowed = [];
 		foreach ( $groups as $group_id ) {
 			$quota = QuotaUtils::get_product_quota( $post_ID, false, $group_id );
-			
+
 			if ( '' === $quota || (int) $quota > 0 ) {
 				$allowed[] = $group_id;
 			}
@@ -169,7 +168,6 @@ class SubscriptionActionsFilters {
 	private static function get_groups_quotas( $groups_allowed, $product_id ) {
 		$groups_quotas = [];
 		foreach ( $groups_allowed as $group_id ) {
-			
 			$quota = QuotaUtils::get_product_quota( $product_id, false, $group_id );
 			if ( $quota > 0 ) {
 				$groups_quotas[ $group_id ] = $quota;
