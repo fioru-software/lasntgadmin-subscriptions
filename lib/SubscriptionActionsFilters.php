@@ -34,7 +34,7 @@ class SubscriptionActionsFilters {
 
 	public static function add_logo_to_mail( &$phpmailer ) {
 
-		$assets_dir = untrailingslashit( plugin_dir_url( __FILE__ ) ) . '/../assets/';
+		$assets_dir = __DIR__ . '/../assets/';
 
 		$file = $assets_dir . 'img/logo.png';
 		$uid = 'lasntg-logo';
