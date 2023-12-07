@@ -320,7 +320,7 @@ class NotificationUtils {
 		$body .= '<p>Please log in to the LASNTG Dashboard to see details - <strong><a href="https://lasntgadmin.veri.ie/wp-admin/" target="_blank" rel="noopener">LASNTG OBS login</a></strong></p>
 <p>Best regards,</p>
 <p>LASNTG Automated Notifications<br/></p>
-<img src="cid:lasntg-logo" width="300" height="400">';
+<img src="cid:lasntg-logo" width="100">';
 
 		return wp_mail( $email, $subject, $body, $headers );
 	}

@@ -110,9 +110,6 @@ class ParseEmail {
 	 */
 	private static function replace( $message, array $fields ) {
 		foreach ( $fields as $name => $value ) {
-			if ( ! is_string( $value ) ) {
-				return $message;
-			}
 			$message = str_replace( "{%$name%}", $value, $message );
 			$message = str_replace( "{% $name %}", $value, $message );
 			$message = str_replace( "{%$name %}", $value, $message );
