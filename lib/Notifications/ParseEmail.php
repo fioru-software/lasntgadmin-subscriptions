@@ -98,6 +98,15 @@ class ParseEmail {
 			'link_to_more_information' => $acf_fields['field_6388216175740'],
 			'course_order'             => $acf_fields['field_6388218175741'],
 		];
+
+		if($course_fields['end_date']){
+			$dt = \DateTime::createFromFormat( 'Ydm', $course_fields['end_date'] );
+			$course_fields['end_date'] = strtotime($dt->format('D M Y'));
+		}
+		if($course_fields['start_date']){
+			$dt = \DateTime::createFromFormat( 'Ydm', $course_fields['start_date'] );
+			$course_fields['start_date'] = strtotime($dt->format('D M Y'));
+		}
 		return self::replace( $message, $course_fields );
 	}
 
