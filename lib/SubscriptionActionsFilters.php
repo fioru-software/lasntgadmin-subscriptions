@@ -37,7 +37,7 @@ class SubscriptionActionsFilters {
 		$assets_dir = __DIR__ . '/../assets/';
 
 		$file = $assets_dir . 'img/logo.png';
-		$uid = 'lasntg-logo';
+		$uid  = 'lasntg-logo';
 		$name = 'logo.png';
 
 		$phpmailer->SMTPKeepAlive = true; //phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
