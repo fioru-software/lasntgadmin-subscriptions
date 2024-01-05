@@ -314,8 +314,20 @@ class NotificationUtils {
 	 * @param  string $body Body.
 	 * @return bool
 	 */
-	protected static function send_mail( $email, $subject, $body ): bool {
+	public static function send_mail( $email, $subject, $body ): bool {
 		$headers = array( 'Content-Type: text/html; charset=UTF-8' );
+
+		$body .= '<p>Please log in to the LASNTG Dashboard to see details - <strong><a href="https://lasntgadmin.veri.ie/wp-admin/" target="_blank" rel="noopener">LASNTG OBS login</a></strong></p>
+<p>Kind Regards,</p>
+<p>LASNTG<br/></p>
+<p>Grúpa Oiliúna Náisiúnta um Sheirbhísí Údaráis Áitiúil |Aonad 4/5, Cúirt an Bhráthar|An tAonach |Tiobraid Árann</p>
+
+<p>Local Authority Services National Training Group| Unit 4/5, Friar’s Court | Nenagh | County Tipperary</p>
+
+<p>T: <a href="tel:+353526166260">+353 52 616 6260</a> | E: <a href="lasntg@tipperarycoco.ie">lasntg@tipperarycoco.ie</a> | <a href="www.lasntg.ie">www.lasntg.ie</a></p>
+
+<p><img src="cid:lasntg-logo" width="100" alt="lasntg"></p>';
+
 		return wp_mail( $email, $subject, $body, $headers );
 	}
 }

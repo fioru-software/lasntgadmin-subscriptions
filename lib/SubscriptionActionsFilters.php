@@ -29,6 +29,19 @@ class SubscriptionActionsFilters {
 		add_action( 'woocommerce_order_status_changed', [ self::class, 'order_cancelled', 10, 3 ] );
 
 		add_action( 'admin_init', [ self::class, 'change_waiting_to_pending' ] );
+		add_action( 'phpmailer_init', [ self::class, 'add_logo_to_mail' ] );
+	}
+
+	public static function add_logo_to_mail( &$phpmailer ) {
+
+		$assets_dir = __DIR__ . '/../assets/';
+
+		$file = $assets_dir . 'img/logo.png';
+		$uid  = 'lasntg-logo';
+		$name = 'logo.png';
+
+		$phpmailer->SMTPKeepAlive = true; //phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+		$phpmailer->AddEmbeddedImage( $file, $uid, $name );
 	}
 	/**
 	 * To be moved to orders plugin.
@@ -75,14 +88,14 @@ class SubscriptionActionsFilters {
 		}
 		$item = array_shift( $items );
 
-		$product_id = $item->get_product_id();
+		$product_id   = $item->get_product_id();
 		$order_groups = GroupUtils::get_read_group_ids( $order_id );
 		$group_quotas = self::get_groups_quotas( $order_groups, $product_id );
-		$sum = 0;
-		foreach($group_quotas as $group_quota){
+		$sum          = 0;
+		foreach ( $group_quotas as $group_quota ) {
 			$sum += $group_quota;
 		}
-		$product    = \wc_get_product( $product_id );
+		$product = \wc_get_product( $product_id );
 		// check if the course had more empty spaces than the order quantity.
 		if ( $sum - $item->get_quantity() > 0 ) {
 			return;
@@ -100,6 +113,7 @@ class SubscriptionActionsFilters {
 		$allowed = [];
 		foreach ( $groups as $group_id ) {
 			$quota = QuotaUtils::get_product_quota( $post_ID, false, $group_id );
+
 			if ( '' === $quota || (int) $quota > 0 ) {
 				$allowed[] = $group_id;
 			}

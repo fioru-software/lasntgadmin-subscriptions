@@ -13,7 +13,7 @@ class WP_Emails {
 		add_filter(
 			'wp_mail',
 			function ( $params ) {
-				$params['headers'] = 'Content-type: text/html';
+				$params['headers'] = 'Content-Type: text/html; charset=UTF-8';
 				return $params;
 			}
 		);
