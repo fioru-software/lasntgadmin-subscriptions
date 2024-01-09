@@ -100,12 +100,12 @@ class ParseEmail {
 		];
 
 		if ( $course_fields['end_date'] ) {
-			$dt                        = \DateTime::createFromFormat( 'Ydm', $course_fields['end_date'] );
-			$course_fields['end_date'] = strtotime( $dt->format( 'D M Y' ) );
+			$dt                        = \DateTime::createFromFormat( 'Ymd', $course_fields['end_date'] );
+			$course_fields['end_date'] = $dt->format( 'd/m/Y' );
 		}
 		if ( $course_fields['start_date'] ) {
-			$dt                          = \DateTime::createFromFormat( 'Ydm', $course_fields['start_date'] );
-			$course_fields['start_date'] = strtotime( $dt->format( 'D M Y' ) );
+			$dt                          = \DateTime::createFromFormat( 'Ymd', $course_fields['start_date'] );
+			$course_fields['start_date'] = $dt->format( 'd/m/Y' );
 		}
 		return self::replace( $message, $course_fields );
 	}
