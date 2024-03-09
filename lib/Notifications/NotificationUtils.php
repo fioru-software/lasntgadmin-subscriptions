@@ -302,6 +302,9 @@ class NotificationUtils {
 		foreach ( $users as $user ) {
 			$unique_body    = ParseEmail::add_receiver_info( $user, $body, $post_ID );
 			$unique_subject = ParseEmail::add_receiver_info( $user, $subject, $post_ID );
+			if ( gettype( $user ) == 'string' || gettype( $user ) == 'integer' ) {
+				$user = get_userdata( $user );
+			}
 			self::send_mail( $user->user_email, $unique_subject, $unique_body );
 		}
 	}

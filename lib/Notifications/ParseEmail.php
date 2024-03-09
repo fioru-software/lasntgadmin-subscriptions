@@ -135,7 +135,13 @@ class ParseEmail {
 	 * @return string
 	 */
 	public static function add_receiver_info( $user, $message, $post_ID ) {
-		$customer = new \WC_Customer( $user->ID );
+		if ( gettype( $user ) == 'string' || gettype( $user ) == 'integer' ) {
+			$customer = new \WC_Customer( $user );
+			$user     = get_userdata( $user );
+		} else {
+			$customer = new \WC_Customer( $user->ID );
+			$user     = get_userdata( $user->ID );
+		}
 
 		$fields = [
 			'to_user_email'      => $user->user_email,
@@ -157,7 +163,7 @@ class ParseEmail {
 		);
 
 		$quotas = [];
-		$user   = get_userdata( $user->ID );
+
 		foreach ( $groups as $group ) {
 			$group_id = $group->group_id;
 			$quota    = QuotaUtils::get_product_quota( $post_ID, false, $group_id );

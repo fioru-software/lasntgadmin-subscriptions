@@ -26,7 +26,8 @@ class SubscriptionActionsFilters {
 
 		add_action( 'lasntgadmin-products_quotas_field_changed', [ self::class, 'quotas_changed' ], 10, 4 );
 		add_action( 'save_post_product', [ self::class, 'save_post' ], 100 );
-		add_action( 'woocommerce_order_status_changed', [ self::class, 'order_cancelled', 10, 3 ] );
+		add_action( 'woocommerce_order_status_changed', [ self::class, 'order_cancelled' ], 10, 3 );
+		add_action( 'woocommerce_order_status_completed', [ self::class, 'new_enrolment_completed' ], 10, 2 );
 
 		add_action( 'admin_init', [ self::class, 'change_waiting_to_pending' ] );
 		add_action( 'phpmailer_init', [ self::class, 'add_logo_to_mail' ] );
@@ -67,6 +68,10 @@ class SubscriptionActionsFilters {
 		}
 		$order->set_status( 'wc-attendees' );
 		$order->save();
+	}
+
+	public static function new_enrolment_completed( $order_id ): void {
+		Notifications::new_enrollment( $order_id );
 	}
 
 	public static function order_cancelled( $order_id, $old_status, $new_status ): void {
