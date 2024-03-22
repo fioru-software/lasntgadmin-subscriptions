@@ -70,6 +70,8 @@ class Notifications {
 
 	public static function new_enrollment( $order_id ): void {
 		$order = wc_get_order( $order_id );
+		
+		$user_id = $order->user_id;
 		$items = $order->get_items( apply_filters( 'woocommerce_purchase_order_item_types', 'line_item' ) ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 		if ( ! $items ) {
@@ -78,8 +80,6 @@ class Notifications {
 		$item       = array_shift( $items );
 		$product_id = $item->get_product_id();
 
-		$post      = get_post( $product_id );
-		$author_id = $post->post_author;
 		$subject   = 'New enrolment is successfully created for course {%name%} | {%start_date%}';
 		$body      = '<p data-renderer-start-pos="216">Hi  {%to_user_name%}</p>
 <p data-renderer-start-pos="238"><a href="' . get_edit_post_link( $order_id ) . '">New enrolment</a> for course {%name%} is created successfuly.
@@ -94,6 +94,6 @@ LASNTG</p>
 &lt;a href="<span data-inline-card="true" data-card-url="http://www.lasntg.ie"><span class="loader-wrapper"><span aria-expanded="false" aria-haspopup="true" data-testid="hover-card-trigger-wrapper"><a class="css-118vsk3" tabindex="0" role="button" href="http://www.lasntg.ie/" data-testid="inline-card-resolved-view"><span class="css-14tyax2" data-testid="inline-card-icon-and-title"><span class="smart-link-title-wrapper css-0">LASNTG</span></span></a></span></span></span> "&gt;&lt;img src="<a class="css-tgpl01" title="https://lasntgadmin-staging.veri.ie/wp-content/uploads/2023/10/image-20231031-085516-e1698745134776.png" href="https://lasntgadmin-staging.veri.ie/wp-content/uploads/2023/10/image-20231031-085516-e1698745134776.png" data-testid="link-with-safety" data-renderer-mark="true">https://lasntgadmin-staging.veri.ie/wp-content/uploads/2023/10/image-20231031-085516-e1698745134776.png</a>" alt="lasntg" /&gt;&lt;/a&gt;</p>';
 		$info      = NotificationUtils::parse_info( $product_id, $subject, $body );
 
-		NotificationUtils::parse_emails_for_users( [ $author_id ], $info['subject'], $info['body'], $product_id );
+		NotificationUtils::parse_emails_for_users( [ $user_id ], $info['subject'], $info['body'], $product_id );
 	}
 }
