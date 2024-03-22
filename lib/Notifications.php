@@ -70,26 +70,26 @@ class Notifications {
 
 	public static function new_enrollment( $order_id ): void {
 		$order = wc_get_order( $order_id );
-		
+
 		$user_id = $order->user_id;
-		$items = $order->get_items( apply_filters( 'woocommerce_purchase_order_item_types', 'line_item' ) ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		$items   = $order->get_items( apply_filters( 'woocommerce_purchase_order_item_types', 'line_item' ) ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 		if ( ! $items ) {
 			return;
 		}
 
-		$user          = get_user_by( 'ID', $user_id );
-		$roles        = (array) $user->roles;
+		$user       = get_user_by( 'ID', $user_id );
+		$roles      = (array) $user->roles;
 		$order_link = get_edit_post_link( $order_id );
-		if(in_array('customer', $roles)){
+		if ( in_array( 'customer', $roles ) ) {
 			$order_link = $order->get_view_order_url();
 		}
-		
+
 		$item       = array_shift( $items );
 		$product_id = $item->get_product_id();
 
-		$subject   = 'New enrolment is successfully created for course {%name%} | {%start_date%}';
-		$body      = '<p data-renderer-start-pos="216">Hi  {%to_user_name%}</p>
+		$subject = 'New enrolment is successfully created for course {%name%} | {%start_date%}';
+		$body    = '<p data-renderer-start-pos="216">Hi  {%to_user_name%}</p>
 <p data-renderer-start-pos="238"><a href="' . $order_link . '">New enrolment</a> for course {%name%} is created successfuly.
 Course Start Date: {%start_date%}
 Course Location: {%location%}</p>
@@ -100,7 +100,7 @@ LASNTG</p>
 <p data-renderer-start-pos="595">Local Authority Services National Training Group| Unit 4/5, Friar’s Court | Nenagh | County Tipperary</p>
 <p data-renderer-start-pos="698">T: &lt;a href="tel:+353526166260"&gt;+353 52 616 6260&lt;/a&gt; | E: &lt;a <a class="css-tgpl01" title="mailto:href=%22lasntg@tipperarycoco.ie" href="mailto:href=%22lasntg@tipperarycoco.ie" data-testid="link-with-safety" data-renderer-mark="true">href="lasntg@tipperarycoco.ie</a>"&gt;<a class="css-tgpl01" title="mailto:lasntg@tipperarycoco.ie" href="mailto:lasntg@tipperarycoco.ie" data-testid="link-with-safety" data-renderer-mark="true">lasntg@tipperarycoco.ie</a>&lt;/a&gt; | &lt;a href="<span data-inline-card="true" data-card-url="http://www.lasntg.ie"><span class="loader-wrapper"><span aria-expanded="false" aria-haspopup="true" data-testid="hover-card-trigger-wrapper"><a class="css-118vsk3" tabindex="0" role="button" href="http://www.lasntg.ie/" data-testid="inline-card-resolved-view"><span class="css-14tyax2" data-testid="inline-card-icon-and-title"><span class="smart-link-title-wrapper css-0">LASNTG</span></span></a></span></span></span> "&gt;<span data-inline-card="true" data-card-url="http://www.lasntg.ie"><span class="loader-wrapper"><span aria-expanded="false" aria-haspopup="true" data-testid="hover-card-trigger-wrapper"><a class="css-118vsk3" tabindex="0" role="button" href="http://www.lasntg.ie/" data-testid="inline-card-resolved-view"><span class="css-14tyax2" data-testid="inline-card-icon-and-title"><span class="smart-link-title-wrapper css-0">LASNTG</span></span></a></span></span></span> &lt;/a&gt;
 &lt;a href="<span data-inline-card="true" data-card-url="http://www.lasntg.ie"><span class="loader-wrapper"><span aria-expanded="false" aria-haspopup="true" data-testid="hover-card-trigger-wrapper"><a class="css-118vsk3" tabindex="0" role="button" href="http://www.lasntg.ie/" data-testid="inline-card-resolved-view"><span class="css-14tyax2" data-testid="inline-card-icon-and-title"><span class="smart-link-title-wrapper css-0">LASNTG</span></span></a></span></span></span> "&gt;&lt;img src="<a class="css-tgpl01" title="https://lasntgadmin-staging.veri.ie/wp-content/uploads/2023/10/image-20231031-085516-e1698745134776.png" href="https://lasntgadmin-staging.veri.ie/wp-content/uploads/2023/10/image-20231031-085516-e1698745134776.png" data-testid="link-with-safety" data-renderer-mark="true">https://lasntgadmin-staging.veri.ie/wp-content/uploads/2023/10/image-20231031-085516-e1698745134776.png</a>" alt="lasntg" /&gt;&lt;/a&gt;</p>';
-		$info      = NotificationUtils::parse_info( $product_id, $subject, $body );
+		$info    = NotificationUtils::parse_info( $product_id, $subject, $body );
 
 		NotificationUtils::parse_emails_for_users( [ $user_id ], $info['subject'], $info['body'], $product_id );
 	}
