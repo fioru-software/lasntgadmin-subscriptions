@@ -77,12 +77,20 @@ class Notifications {
 		if ( ! $items ) {
 			return;
 		}
+
+		$user          = get_user_by( 'ID', $user_id );
+		$roles        = (array) $user->roles;
+		$order_link = get_edit_post_link( $order_id );
+		if(in_array('customer', $roles)){
+			$order_link = $order->get_view_order_url();
+		}
+		
 		$item       = array_shift( $items );
 		$product_id = $item->get_product_id();
 
 		$subject   = 'New enrolment is successfully created for course {%name%} | {%start_date%}';
 		$body      = '<p data-renderer-start-pos="216">Hi  {%to_user_name%}</p>
-<p data-renderer-start-pos="238"><a href="' . get_edit_post_link( $order_id ) . '">New enrolment</a> for course {%name%} is created successfuly.
+<p data-renderer-start-pos="238"><a href="' . $order_link . '">New enrolment</a> for course {%name%} is created successfuly.
 Course Start Date: {%start_date%}
 Course Location: {%location%}</p>
 <p data-renderer-start-pos="406">Please log in to the LASNTG Dashboard to see details.</p>
