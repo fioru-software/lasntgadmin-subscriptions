@@ -118,11 +118,18 @@ class ParseEmail {
 	 * @return string
 	 */
 	private static function replace( $message, array $fields ) {
-		foreach ( $fields as $name => $value ) {
-			$message = str_replace( "{%$name%}", $value, $message );
-			$message = str_replace( "{% $name %}", $value, $message );
-			$message = str_replace( "{%$name %}", $value, $message );
-			$message = str_replace( "{% $name%}", $value, $message );
+		try {
+			foreach ( $fields as $name => $value ) {
+				if ( is_array( $value ) ) {
+					$value = implode( ', ', $value );
+				}
+				$message = str_replace( "{%$name%}", $value, $message );
+				$message = str_replace( "{% $name %}", $value, $message );
+				$message = str_replace( "{%$name %}", $value, $message );
+				$message = str_replace( "{% $name%}", $value, $message );
+			}
+		} catch ( \Exception $e ) {
+			error_log( $e->getMessage() );
 		}
 		return $message;
 	}
