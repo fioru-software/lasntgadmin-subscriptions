@@ -71,14 +71,15 @@ class Notifications {
 	public static function new_enrollment( $order_id ): void {
 		$order = wc_get_order( $order_id );
 
-		$user_id = $order->user_id;
+		$user_id = $order->get_user_id();
 		$items   = $order->get_items( apply_filters( 'woocommerce_purchase_order_item_types', 'line_item' ) ); //phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 		if ( ! $items ) {
 			return;
 		}
 
-		$user       = get_user_by( 'ID', $user_id );
+		// Get the WP_User Object instance.
+		$user       = $order->get_user();
 		$roles      = (array) $user->roles;
 		$order_link = get_edit_post_link( $order_id );
 		if ( in_array( 'customer', $roles ) ) {

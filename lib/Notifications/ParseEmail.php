@@ -123,6 +123,9 @@ class ParseEmail {
 				if ( is_array( $value ) ) {
 					$value = implode( ', ', $value );
 				}
+				if ( is_empty( $value ) ) {
+					continue;
+				}
 				$message = str_replace( "{%$name%}", $value, $message );
 				$message = str_replace( "{% $name %}", $value, $message );
 				$message = str_replace( "{%$name %}", $value, $message );
