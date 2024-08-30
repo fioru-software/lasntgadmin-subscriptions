@@ -71,7 +71,7 @@ abstract class BaseNotification {
 
 	protected static function process_payment_link( $user, $post_ID, $link ) {
 		$email = NotificationUtils::get_email_subject_and_body( $post_ID, 'course_space_available_free_subject', 'course_space_available_free' );
-		
+
 		if ( $email && $email['subject'] && $email['body'] ) {
 			$link    = "<a href='$link'>Click Here to view</a>";
 			$subject = str_replace( '{%payment-link%}', $link, $email['subject'] );
