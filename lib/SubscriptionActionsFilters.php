@@ -215,7 +215,7 @@ class SubscriptionActionsFilters {
 					PrivateNotifications::space_available( $post_id, $user, get_permalink( $post_id ) );
 				} else {
 					$nonce        = wp_generate_password( 12, false );
-					$attendee_url = admin_url( 'post.php?post=' . $order->get_id() ) . '&action=edit&email_notification=' . $nonce.'&tab=order';
+					$attendee_url = admin_url( 'post.php?post=' . $order->get_id() ) . '&action=edit&email_notification=' . $nonce.'&tab=attendees';
 
 					update_post_meta( $order->get_id(), self::$action . "_$user_id", $nonce );
 					TrainingCenterNotifications::space_available( $post_id, $user, $attendee_url );
