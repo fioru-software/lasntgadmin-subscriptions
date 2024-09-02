@@ -65,7 +65,6 @@ class ParseEmail {
 			// incase it's order.
 			return self::add_course_info_with_product( $post_ID, $message );
 		}
-		$acf_fields = array_map( 'sanitize_text_field', wp_unslash( $_POST['acf'] ) ); //phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 		$post          = $_POST; //phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$course_fields = [
@@ -76,27 +75,27 @@ class ParseEmail {
 			'description'              => $product->get_description(),
 			'link'                     => $product->get_permalink(),
 			'status'                   => ProductUtils::get_status_name( $product->get_status() ),
-			'event_type'               => $acf_fields['field_6387864196776'],
-			'awarding_body'            => $acf_fields['field_638786be96777'],
-			'start_date'               => $acf_fields['field_63881aee31478'],
-			'start_time'               => $acf_fields['field_63881b0531479'],
-			'end_date'                 => $acf_fields['field_63881b1e3147a'],
-			'end_time'                 => $acf_fields['field_63881b2c3147b'],
-			'duration'                 => $acf_fields['field_63881b63798a4'],
-			'location'                 => $acf_fields['field_63881b84798a5'],
-			'training_centre'          => $acf_fields['field_63881beb798a7'],
-			'training_group'           => $acf_fields['field_63881c1ff4453'],
-			'trainer_name'             => $acf_fields['field_63881cc2f4455'],
-			'trainer_email'            => $acf_fields['field_63881ce6f4456'],
-			'training_provider'        => $acf_fields['field_63881cf7f4457'],
-			'training_aim'             => $acf_fields['field_6387890fd6a25'],
-			'award'                    => isset( $acf_fields['field_63881d74f445a'] ) ? $acf_fields['field_63881d74f445a'] : '',
-			'applicable_regulation'    => $acf_fields['field_63878939d6a27'],
-			'primary_target_grade'     => $acf_fields['field_63881f7f3e5af'],
-			'other_grades_applicable'  => $acf_fields['field_638820173e5b0'],
-			'expiry_period'            => $acf_fields['field_63882047beae3'],
-			'link_to_more_information' => $acf_fields['field_6388216175740'],
-			'course_order'             => $acf_fields['field_6388218175741'],
+			'event_type'               => self::get_field( 'field_6387864196776' ),
+			'awarding_body'            => self::get_field( 'field_638786be96777' ),
+			'start_date'               => self::get_field( 'field_63881aee31478' ),
+			'start_time'               => self::get_field( 'field_63881b0531479' ),
+			'end_date'                 => self::get_field( 'field_63881b1e3147a' ),
+			'end_time'                 => self::get_field( 'field_63881b2c3147b' ),
+			'duration'                 => self::get_field( 'field_63881b63798a4' ),
+			'location'                 => self::get_field( 'field_63881b84798a5' ),
+			'training_centre'          => self::get_field( 'field_63881beb798a7' ),
+			'training_group'           => self::get_field( 'field_63881c1ff4453' ),
+			'trainer_name'             => self::get_field( 'field_63881cc2f4455' ),
+			'trainer_email'            => self::get_field( 'field_63881ce6f4456' ),
+			'training_provider'        => self::get_field( 'field_63881cf7f4457' ),
+			'training_aim'             => self::get_field( 'field_6387890fd6a25' ),
+			'award'                    => self::get_field( 'field_63881d74f445a' ),
+			'applicable_regulation'    => self::get_field( 'field_63878939d6a27' ),
+			'primary_target_grade'     => self::get_field( 'field_63881f7f3e5af' ),
+			'other_grades_applicable'  => self::get_field( 'field_638820173e5b0' ),
+			'expiry_period'            => self::get_field( 'field_63882047beae3' ),
+			'link_to_more_information' => self::get_field( 'field_6388216175740' ),
+			'course_order'             => self::get_field( 'field_6388218175741' ),
 		];
 
 		if ( $course_fields['end_date'] ) {
@@ -108,6 +107,20 @@ class ParseEmail {
 			$course_fields['start_date'] = $dt->format( 'd/m/Y' );
 		}
 		return self::replace( $message, $course_fields );
+	}
+
+	/**
+	 * Get field
+	 *
+	 * @param string $name Name of the field.
+	 * @return string
+	 */
+	public static function get_field( $name ) {
+		if ( ! isset( $_POST['acf'] ) ) { //phpcs:ignore WordPress.Security.NonceVerification.Missing
+			return '';
+		}
+		$acf_fields = array_map( 'sanitize_text_field', wp_unslash( $_POST['acf'] ) ); //phpcs:ignore WordPress.Security.NonceVerification.Missing
+		return isset( $acf_fields[ $name ] ) ? $acf_fields[ $name ] : '';
 	}
 
 	/**
