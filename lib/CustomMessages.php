@@ -13,7 +13,7 @@ class CustomMessages {
 	public static function modal(): void {
 		global $post;
 		$post_type = property_exists( get_current_screen(), 'post_type' ) ? get_current_screen()->post_type : false;
-		if ( 'product' !== $post_type ) {
+		if ( ! $post || 'product' !== $post_type ) {
 			return;
 		}
 		?>
