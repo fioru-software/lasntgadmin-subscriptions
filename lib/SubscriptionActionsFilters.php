@@ -29,7 +29,6 @@ class SubscriptionActionsFilters {
 		add_action( 'woocommerce_order_status_changed', [ self::class, 'order_cancelled' ], 10, 3 );
 		add_action( 'woocommerce_order_status_completed', [ self::class, 'new_enrolment_completed' ], 10, 2 );
 
-		add_action( 'admin_init', [ self::class, 'change_waiting_to_pending' ] );
 		add_action( 'phpmailer_init', [ self::class, 'add_logo_to_mail' ] );
 	}
 
@@ -43,31 +42,6 @@ class SubscriptionActionsFilters {
 
 		$phpmailer->SMTPKeepAlive = true; //phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 		$phpmailer->AddEmbeddedImage( $file, $uid, $name );
-	}
-	/**
-	 * To be moved to orders plugin.
-	 */
-	public static function change_waiting_to_pending() {
-		if (
-			! isset( $_GET['email_notification'] )
-			|| ! isset( $_GET['post'] )
-		) {
-			return;
-		}
-		$post_id  = sanitize_text_field( wp_unslash( $_GET['post'] ) );
-		$key      = sanitize_text_field( wp_unslash( $_GET['email_notification'] ) );
-		$user_id  = get_current_user_id();
-		$post_key = get_post_meta( $post_id, self::$action . "_$user_id", true );
-		if ( $key !== $post_key ) {
-			return;
-		}
-		$order = wc_get_order( $post_id );
-
-		if ( ! $order->has_status( 'waiting-list' ) ) {
-			return;
-		}
-		$order->set_status( 'wc-attendees' );
-		$order->save();
 	}
 
 	public static function new_enrolment_completed( $order_id ): void {
@@ -215,7 +189,7 @@ class SubscriptionActionsFilters {
 					PrivateNotifications::space_available( $post_id, $user, get_permalink( $post_id ) );
 				} else {
 					$nonce        = wp_generate_password( 12, false );
-					$attendee_url = admin_url( 'post.php?post=' . $order->get_id() ) . '&action=edit&email_notification=' . $nonce . '&tab=attendees';
+					$attendee_url = admin_url( 'post.php?post=' . $order->get_id() ) . '&action=edit&email_notification=' . $nonce . '&tab=order';
 
 					update_post_meta( $order->get_id(), self::$action . "_$user_id", $nonce );
 					TrainingCenterNotifications::space_available( $post_id, $user, $attendee_url );
