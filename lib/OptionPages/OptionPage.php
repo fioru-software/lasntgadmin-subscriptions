@@ -189,7 +189,7 @@ class OptionPage {
 		<div class="wrap">
 			<h2>
 				<?php
-				echo __( 'Lasntg Subscriptions', 'lasntgadmin' ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 
+				echo __( 'LASNTG Subscriptions', 'lasntgadmin' ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 
 				?>
 			</h2>
 
