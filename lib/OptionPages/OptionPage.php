@@ -171,8 +171,8 @@ class OptionPage {
 	 */
 	public static function add_plugin_page(): void {
 		add_options_page(
-			__( 'Lasntg Subscriptions', 'lasntgadmin' ),
-			__( 'Lasntg Subscriptions', 'lasntgadmin' ),
+			__( 'LASNTG Subscriptions', 'lasntgadmin' ),
+			__( 'LASNTG Subscriptions', 'lasntgadmin' ),
 			'manage_options',
 			'lasntg-subscriptions',
 			[ self::class, 'create_admin_page' ]
