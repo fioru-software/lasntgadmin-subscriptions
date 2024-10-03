@@ -33,8 +33,8 @@ class SubscriptionsOptionPage {
 	 */
 	public static function add_plugin_page(): void {
 		add_options_page(
-			__( 'Lasntg Subscription Options', 'lasntgadmin' ),
-			__( 'Lasntg Subscriptions Options', 'lasntgadmin' ),
+			__( 'LASNTG Subscription Options', 'lasntgadmin' ),
+			__( 'LASNTG Subscriptions Options', 'lasntgadmin' ),
 			'lasntg_list_options',
 			'lasntg-subscriptions-list',
 			[ self::class, 'create_admin_page' ]
@@ -71,7 +71,7 @@ class SubscriptionsOptionPage {
 		<div class="wrap">
 			<h2>
 				<?php
-				echo __( 'Lasntg Subscriptions List', 'lasntgadmin' ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 
+				echo __( 'LASNTG Subscriptions List', 'lasntgadmin' ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 
 				?>
 			</h2>
 			<?php SubscriptionManager::show_form(); ?>
