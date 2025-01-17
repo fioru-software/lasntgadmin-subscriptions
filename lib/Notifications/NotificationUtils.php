@@ -47,7 +47,7 @@ class NotificationUtils {
 		$product = new \WC_Product( $post_ID );
 		$cat_ids = $product->get_category_ids();
 		if ( ! isset( $_POST['acf'] ) ) { //phpcs:ignore WordPress.Security.NonceVerification.Missing
-			return;
+			return [];
 		}
 		$acf         = $_POST['acf']; //phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$course_type = sanitize_text_field( wp_unslash( $acf[ self::$course_acf ] ) );
