@@ -35,9 +35,9 @@ class NotificationUtils {
 		return $value;
 	}
 
-	public static function check_subscription( $post_ID, $users ) {
-		if ( ! $users ) {
-			return $users;
+	public static function check_subscription( int $post_ID, array $users ): array {
+		if ( ! $users || ! isset( $_POST['acf'] ) ) { //phpcs:ignore WordPress.Security.NonceVerification.Missing
+			return [];
 		}
 		/**
 		 * Check categories.
@@ -46,9 +46,7 @@ class NotificationUtils {
 		 */
 		$product = new \WC_Product( $post_ID );
 		$cat_ids = $product->get_category_ids();
-		if ( ! isset( $_POST['acf'] ) ) { //phpcs:ignore WordPress.Security.NonceVerification.Missing
-			return;
-		}
+
 		$acf         = $_POST['acf']; //phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$course_type = sanitize_text_field( wp_unslash( $acf[ self::$course_acf ] ) );
 
