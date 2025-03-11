@@ -32,7 +32,7 @@ abstract class BaseNotification {
 
 			if ( $user_count >= NotificationUtils::$per_page ) {
 				as_schedule_single_action(
-					time() + 60 * 2,
+					time() + 60 * 2 * $page + 1,
 					// Run after 2 mins.
 					'lasntgadmin_new_course_notifications',
 					array(
