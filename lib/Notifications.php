@@ -62,10 +62,12 @@ class Notifications {
 	}
 
 	public static function new_course( $post_ID ): void {
-		ManagersNotifications::new_course( $post_ID );
-		TrainingCenterNotifications::new_course( $post_ID );
-		RegionalManagerNotifications::new_course( $post_ID );
-		PrivateNotifications::new_course( $post_ID );
+		as_schedule_single_action(
+			time() + 60,
+			// Run after 1 min.
+			'lasntgadmin_start_new_course_notifications',
+			array( 'post_ID' => $post_ID )
+		);
 	}
 
 	public static function new_enrollment( $order_id ): void {

@@ -7,7 +7,9 @@ use Lasntg\Admin\Group\GroupUtils;
 use Lasntg\Admin\Orders\OrderUtils;
 use Lasntg\Admin\Products\ProductUtils;
 use Lasntg\Admin\Products\QuotaUtils;
+use Lasntg\Admin\Subscriptions\Notifications\ManagersNotifications;
 use Lasntg\Admin\Subscriptions\Notifications\PrivateNotifications;
+use Lasntg\Admin\Subscriptions\Notifications\RegionalManagerNotifications;
 use Lasntg\Admin\Subscriptions\Notifications\TrainingCenterNotifications;
 use Lasntg\Admin\Subscriptions\SubscriptionPages\SubscriptionManager;
 
@@ -30,8 +32,21 @@ class SubscriptionActionsFilters {
 		add_action( 'woocommerce_order_status_completed', [ self::class, 'new_enrolment_completed' ], 10, 2 );
 
 		add_action( 'phpmailer_init', [ self::class, 'add_logo_to_mail' ] );
+		add_action( 'lasntgadmin_new_course_notifications', [ self::class, 'lasntgadmin_new_course_notifications' ], 10, 3 );
+		add_action( 'lasntgadmin_start_new_course_notifications', [ self::class, 'lasntgadmin_start_new_course_notifications' ], 10, 1 );
 	}
 
+	public static function lasntgadmin_start_new_course_notifications( $post_ID ): void {
+		error_log( 'lasntgadmin_start_new_course_notifications:' . $post_ID );
+		ManagersNotifications::new_course( $post_ID );
+		TrainingCenterNotifications::new_course( $post_ID );
+		RegionalManagerNotifications::new_course( $post_ID );
+		PrivateNotifications::new_course( $post_ID );
+	}
+	public static function lasntgadmin_new_course_notifications( $page, $post_ID, $cls ): void {
+		error_log( "Single cron job executed with args lasntgadmin_new_course_notifications: $page, $post_ID, $cls" );
+		call_user_func( [ $cls, 'new_course' ], $post_ID, $page );
+	}
 	public static function add_logo_to_mail( &$phpmailer ) {
 
 		$assets_dir = __DIR__ . '/../assets/';

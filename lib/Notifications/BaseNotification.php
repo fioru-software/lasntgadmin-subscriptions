@@ -23,9 +23,26 @@ abstract class BaseNotification {
 	 * @param  mixed $post_ID Post ID.
 	 * @return void
 	 */
-	public static function new_course( $post_ID ): void {
+	public static function new_course( $post_ID, $page = 1 ): void {
 		self::set_option_name();
-		NotificationUtils::get_content( $post_ID, 'course_new_subject', 'course_new', static::$user_role );
+		error_log( "called new_course: $post_ID, $page" );
+		$user_count = NotificationUtils::get_content( $post_ID, 'course_new_subject', 'course_new', static::$user_role, $page );
+		if ( is_int( $user_count ) && $user_count >= NotificationUtils::$per_page ) {
+			error_log( "set single action($user_count):  Post ID: $post_ID, " . static::$user_role );
+
+			if ( $user_count >= NotificationUtils::$per_page ) {
+				as_schedule_single_action(
+					time() + 60 * 2,
+					// Run after 2 mins.
+					'lasntgadmin_new_course_notifications',
+					array(
+						'page'       => $page + 1,
+						'product_id' => $post_ID,
+						'class'      => get_called_class(),
+					)
+				);
+			}
+		}
 	}
 	/**
 	 * Status Changed.

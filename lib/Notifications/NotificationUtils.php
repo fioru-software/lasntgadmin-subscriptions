@@ -10,6 +10,7 @@ class NotificationUtils {
 
 	public static $location_acf = 'field_63881b84798a5';
 	public static $course_acf   = 'field_6387864196776';
+	public static $per_page     = 10;
 	/**
 	 * Should be placed in groups plugin.
 	 */
@@ -67,20 +68,23 @@ class NotificationUtils {
 
 		return $users;
 	}
-
 	/**
 	 * Get Users in group.
 	 *
 	 * @param  int    $post_ID Post ID.
 	 * @param  string $role User Role.
+	 * @param  string $page Page(count) to send to.
 	 * @return array
 	 */
-	public static function get_users_in_group( $post_ID, $role = 'national_manager' ) {
+	public static function get_users_in_group( $post_ID, $role = 'national_manager', $page = 1 ) {
 		global $wpdb;
-
+		$start     = microtime( true );
 		$user_role = "%$role%";
 		$group_ids = self::get_post_group_ids( $post_ID );
+		$params    = array_merge( [ $user_role ], $group_ids );
 		$users     = [];
+		--$page;
+		$page      = $page * self::$per_page;
 
 		// check quotas for training officer.
 		// remove groups with zero quotas.
@@ -98,23 +102,26 @@ class NotificationUtils {
 			}
 			// add users with orders. will find those that are excluded by group.
 			$users = self::get_users_by_product_orders_by_role( $post_ID );
+			error_log( 'Count users(' . count( $users ) . ") for role: $role" );
 		}
 		if ( ! $group_ids ) {
 			return [];
 		}
 
-		$params   = array_merge( [ $user_role ], $group_ids );
 		$string_s = implode( ', ', array_fill( 0, count( $group_ids ), '%s' ) );
-		$query    = "select u.ID, u.display_name, u.user_email From wp_users u
-                  INNER JOIN {$wpdb->usermeta} um
-                  on um.user_id = u.ID
-                  INNER JOIN wp_groups_user_group g
-                  on g.user_id = u.ID
-                  where meta_value like %s
-                  AND meta_key = 'wp_capabilities'
-                  AND g.group_id in ($string_s) GROUP BY u.ID";
+		$query    = "SELECT u.ID, u.display_name, u.user_email 
+FROM wp_users u
+INNER JOIN wp_usermeta um ON um.user_id = u.ID AND um.meta_key = 'wp_capabilities' AND um.meta_value LIKE %s
+INNER JOIN wp_groups_user_group g ON g.user_id = u.ID
+WHERE g.group_id IN ($string_s)
+GROUP BY u.ID
+LIMIT %d OFFSET %d";
 
-		$results = $wpdb->get_results( $wpdb->prepare( $query, $params ) ); //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$params[] = self::$per_page;
+		$params[] = $page;
+		$results  = $wpdb->get_results( $wpdb->prepare( $query, $params ) ); //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$count    = count( $results );
+		error_log( "Count: $count, $page," . self::$per_page );
 		// get unique users rather than duplicates.
 		if (
 			'training_officer' === $role ||
@@ -132,6 +139,11 @@ class NotificationUtils {
 				$user_ids[] = $user->ID;
 			}
 		}
+
+		$end           = microtime( true );
+		$execution_time = $end - $start;
+		error_log( 'Count users End(' . count( $results ) . ") for role: $role" );
+		error_log( 'Execution time:' . round( $execution_time, 4 ) . " for get_users_in group for role $role" );
 		return $results;
 	}
 
@@ -173,7 +185,6 @@ class NotificationUtils {
 				array_merge( $order_status, [ $product_id, $user_role ] )
 			)
 		);
-
 		return $results;
 	}
 
@@ -276,7 +287,7 @@ class NotificationUtils {
 	 * @param  string $user_role User Role.
 	 * @return bool True|False.
 	 */
-	public static function get_content( $post_ID, $subject, $body, $user_role = 'national_manager' ): bool {
+	public static function get_content( $post_ID, $subject, $body, $user_role = 'national_manager', $page = 1 ) {
 		$email = self::get_email_subject_and_body( $post_ID, $subject, $body );
 
 		if ( ! $email ) {
@@ -284,9 +295,10 @@ class NotificationUtils {
 		}
 		$email_subject = $email['subject'];
 		$email_body    = $email['body'];
-		$users         = self::get_users_in_group( $post_ID, $user_role );
+		$users         = self::get_users_in_group( $post_ID, $user_role, $page );
 		self::parse_emails_for_users( $users, $email_subject, $email_body, $post_ID );
-		return true;
+
+		return count( $users );
 	}
 	/**
 	 * Parse Emails for users.
@@ -297,6 +309,8 @@ class NotificationUtils {
 	 * @return void
 	 */
 	public static function parse_emails_for_users( $users, $subject, $body, $post_ID ): void {
+		error_log( 'Count users to parse' . count( $users ) );
+		$start = microtime( true );
 		foreach ( $users as $user ) {
 			$unique_body    = ParseEmail::add_receiver_info( $user, $body, $post_ID );
 			$unique_subject = ParseEmail::add_receiver_info( $user, $subject, $post_ID );
@@ -305,6 +319,11 @@ class NotificationUtils {
 			}
 			self::send_mail( $user->user_email, $unique_subject, $unique_body );
 		}
+
+		$end           = microtime( true );
+		$execution_time = $end - $start;
+
+		error_log( 'Execution time for parse emails: ' . round( $execution_time, 4 ) . ' seconds' );
 	}
 
 	/**
