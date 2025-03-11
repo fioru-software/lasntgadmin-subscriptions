@@ -37,14 +37,12 @@ class SubscriptionActionsFilters {
 	}
 
 	public static function lasntgadmin_start_new_course_notifications( $post_ID ): void {
-		error_log( 'lasntgadmin_start_new_course_notifications:' . $post_ID );
 		ManagersNotifications::new_course( $post_ID );
 		TrainingCenterNotifications::new_course( $post_ID );
 		RegionalManagerNotifications::new_course( $post_ID );
 		PrivateNotifications::new_course( $post_ID );
 	}
 	public static function lasntgadmin_new_course_notifications( $page, $post_ID, $cls ): void {
-		error_log( "Single cron job executed with args lasntgadmin_new_course_notifications: $page, $post_ID, $cls" );
 		call_user_func( [ $cls, 'new_course' ], $post_ID, $page );
 	}
 	public static function add_logo_to_mail( &$phpmailer ) {

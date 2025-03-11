@@ -25,11 +25,8 @@ abstract class BaseNotification {
 	 */
 	public static function new_course( $post_ID, $page = 1 ): void {
 		self::set_option_name();
-		error_log( "called new_course: $post_ID, $page" );
 		$user_count = NotificationUtils::get_content( $post_ID, 'course_new_subject', 'course_new', static::$user_role, $page );
 		if ( is_int( $user_count ) && $user_count >= NotificationUtils::$per_page ) {
-			error_log( "set single action($user_count):  Post ID: $post_ID, " . static::$user_role );
-
 			if ( $user_count >= NotificationUtils::$per_page ) {
 				as_schedule_single_action(
 					time() + 60 * 2 * $page + 1,

@@ -78,7 +78,6 @@ class NotificationUtils {
 	 */
 	public static function get_users_in_group( $post_ID, $role = 'national_manager', $page = 1 ) {
 		global $wpdb;
-		$start     = microtime( true );
 		$user_role = "%$role%";
 		$group_ids = self::get_post_group_ids( $post_ID );
 		$params    = array_merge( [ $user_role ], $group_ids );
@@ -102,7 +101,6 @@ class NotificationUtils {
 			}
 			// add users with orders. will find those that are excluded by group.
 			$users = self::get_users_by_product_orders_by_role( $post_ID );
-			error_log( 'Count users(' . count( $users ) . ") for role: $role" );
 		}
 		if ( ! $group_ids ) {
 			return [];
@@ -120,8 +118,7 @@ LIMIT %d OFFSET %d";
 		$params[] = self::$per_page;
 		$params[] = $page;
 		$results  = $wpdb->get_results( $wpdb->prepare( $query, $params ) ); //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-		$count    = count( $results );
-		error_log( "Count: $count, $page," . self::$per_page );
+		
 		// get unique users rather than duplicates.
 		if (
 			'training_officer' === $role ||
@@ -140,10 +137,6 @@ LIMIT %d OFFSET %d";
 			}
 		}
 
-		$end           = microtime( true );
-		$execution_time = $end - $start;
-		error_log( 'Count users End(' . count( $results ) . ") for role: $role" );
-		error_log( 'Execution time:' . round( $execution_time, 4 ) . " for get_users_in group for role $role" );
 		return $results;
 	}
 
@@ -309,8 +302,7 @@ LIMIT %d OFFSET %d";
 	 * @return void
 	 */
 	public static function parse_emails_for_users( $users, $subject, $body, $post_ID ): void {
-		error_log( 'Count users to parse' . count( $users ) );
-		$start = microtime( true );
+		
 		foreach ( $users as $user ) {
 			$unique_body    = ParseEmail::add_receiver_info( $user, $body, $post_ID );
 			$unique_subject = ParseEmail::add_receiver_info( $user, $subject, $post_ID );
@@ -320,10 +312,6 @@ LIMIT %d OFFSET %d";
 			self::send_mail( $user->user_email, $unique_subject, $unique_body );
 		}
 
-		$end           = microtime( true );
-		$execution_time = $end - $start;
-
-		error_log( 'Execution time for parse emails: ' . round( $execution_time, 4 ) . ' seconds' );
 	}
 
 	/**
