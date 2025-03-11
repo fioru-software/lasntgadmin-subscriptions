@@ -83,7 +83,7 @@ class NotificationUtils {
 		$params    = array_merge( [ $user_role ], $group_ids );
 		$users     = [];
 		--$page;
-		$page      = $page * self::$per_page;
+		$page = $page * self::$per_page;
 
 		// check quotas for training officer.
 		// remove groups with zero quotas.
@@ -118,7 +118,7 @@ LIMIT %d OFFSET %d";
 		$params[] = self::$per_page;
 		$params[] = $page;
 		$results  = $wpdb->get_results( $wpdb->prepare( $query, $params ) ); //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-		
+
 		// get unique users rather than duplicates.
 		if (
 			'training_officer' === $role ||
@@ -302,7 +302,7 @@ LIMIT %d OFFSET %d";
 	 * @return void
 	 */
 	public static function parse_emails_for_users( $users, $subject, $body, $post_ID ): void {
-		
+
 		foreach ( $users as $user ) {
 			$unique_body    = ParseEmail::add_receiver_info( $user, $body, $post_ID );
 			$unique_subject = ParseEmail::add_receiver_info( $user, $subject, $post_ID );
@@ -311,7 +311,6 @@ LIMIT %d OFFSET %d";
 			}
 			self::send_mail( $user->user_email, $unique_subject, $unique_body );
 		}
-
 	}
 
 	/**
