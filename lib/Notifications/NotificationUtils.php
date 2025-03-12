@@ -324,7 +324,7 @@ LIMIT %d OFFSET %d";
 	public static function send_mail( $email, $subject, $body ): bool {
 		$headers = array( 'Content-Type: text/html; charset=UTF-8' );
 
-		$body .= '<p>Please log in to the LASNTG Dashboard to see details - <strong><a href="https://lasntgadmin.veri.ie/wp-admin/" target="_blank" rel="noopener">LASNTG OBS login</a></strong></p>
+		$body .= '<p>Please log in to the LASNTG Dashboard to see details - <strong><a href="' . get_option( 'siteurl' ) . '/wp-admin/" target="_blank" rel="noopener">LASNTG OBS login</a></strong></p>
 <p>Kind Regards,</p>
 <p>LASNTG<br/></p>
 <p>Grúpa Oiliúna Náisiúnta um Sheirbhísí Údaráis Áitiúil |Aonad 4/5, Cúirt an Bhráthar|An tAonach |Tiobraid Árann</p>

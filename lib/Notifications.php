@@ -23,28 +23,21 @@ class Notifications {
 		// notify Managers.
 		// orders should be cancelled already.
 		// notify all users that had orders.
-		$subject = get_post_meta( $post_ID, '_cancellation_subject', true );
-		$body    = get_post_meta( $post_ID, '_cancellation_message', true );
-
-		$email = NotificationUtils::parse_info( $post_ID, $subject, $body );
-		if ( $subject && $body ) {
-			ManagersNotifications::custom_canellation_with_message( $post_ID, $email['subject'], $email['body'] );
-			RegionalManagerNotifications::custom_canellation_with_message( $post_ID, $email['subject'], $email['body'] );
-			TrainingCenterNotifications::custom_canellation_with_message( $post_ID, $email['subject'], $email['body'] );
-			PrivateNotifications::custom_canellation_with_message( $post_ID, $email['subject'], $email['body'] );
-		} else {
-			ManagersNotifications::course_cancelled( $post_ID );
-			RegionalManagerNotifications::course_cancelled( $post_ID );
-			TrainingCenterNotifications::course_cancelled( $post_ID );
-			PrivateNotifications::course_cancelled( $post_ID );
-		}
+		as_schedule_single_action(
+			time() + 60,
+			// Run after 1 min.
+			'lasntgadmin_start_course_cancelled_notifications',
+			array( 'post_ID' => $post_ID )
+		);
 	}
 
 	public static function course_updated( $post_ID ): void {
-		ManagersNotifications::course_updated( $post_ID );
-		RegionalManagerNotifications::course_updated( $post_ID );
-		TrainingCenterNotifications::course_updated( $post_ID );
-		PrivateNotifications::course_updated( $post_ID );
+		as_schedule_single_action(
+			time() + 60,
+			// Run after 1 min.
+			'lasntgadmin_start_course_updated_notifications',
+			array( 'post_ID' => $post_ID )
+		);
 	}
 	public static function course_status_change( $post_ID ): void {
 		return;
