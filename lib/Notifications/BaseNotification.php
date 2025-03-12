@@ -78,7 +78,7 @@ abstract class BaseNotification {
 		self::get_content( $post_ID, 'lasntgadmin_course_notifications', 'course_open_for_enrollment_subject', 'course_open_for_enrollment', 'open_for_enrollment', $page );
 	}
 
-	public static function custom_canellation_with_message( $post_ID, $subject, $body, $page = 1 ) {
+	public static function custom_cancelletaion( $post_ID, $subject, $body, $page = 1 ) {
 		$user_count = NotificationUtils::get_users_in_group( $post_ID, static::$user_role, $page );
 		NotificationUtils::parse_emails_for_users( $user_count, $subject, $body, $post_ID );
 		$action = 'lasntgadmin_course_notifications';
@@ -93,7 +93,7 @@ abstract class BaseNotification {
 						'page'       => $page + 1,
 						'product_id' => $post_ID,
 						'class'      => get_called_class(),
-						'method'     => 'custom_canellation_with_message',
+						'method'     => 'custom_cancelletaion',
 					)
 				);
 			}

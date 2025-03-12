@@ -47,10 +47,10 @@ class SubscriptionActionsFilters {
 		$email = NotificationUtils::parse_info( $post_ID, $subject, $body );
 
 		if ( $subject && $body ) {
-			ManagersNotifications::custom_canellation_with_message( $post_ID, $email['subject'], $email['body'] );
-			RegionalManagerNotifications::custom_canellation_with_message( $post_ID, $email['subject'], $email['body'] );
-			TrainingCenterNotifications::custom_canellation_with_message( $post_ID, $email['subject'], $email['body'] );
-			PrivateNotifications::custom_canellation_with_message( $post_ID, $email['subject'], $email['body'] );
+			ManagersNotifications::custom_cancelletaion( $post_ID, $email['subject'], $email['body'] );
+			RegionalManagerNotifications::custom_cancelletaion( $post_ID, $email['subject'], $email['body'] );
+			TrainingCenterNotifications::custom_cancelletaion( $post_ID, $email['subject'], $email['body'] );
+			PrivateNotifications::custom_cancelletaion( $post_ID, $email['subject'], $email['body'] );
 		} else {
 			ManagersNotifications::course_cancelled( $post_ID );
 			RegionalManagerNotifications::course_cancelled( $post_ID );
@@ -74,7 +74,7 @@ class SubscriptionActionsFilters {
 	}
 
 	public static function lasntgadmin_course_notifications( $page, $post_ID, $cls, $method ): void {
-		if ( 'custom_canellation_with_message' == $method ) {
+		if ( 'custom_cancelletaion' == $method ) {
 			$subject = get_post_meta( $post_ID, '_cancellation_subject', true );
 			$body    = get_post_meta( $post_ID, '_cancellation_message', true );
 
