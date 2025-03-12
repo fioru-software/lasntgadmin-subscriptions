@@ -74,7 +74,6 @@ class SubscriptionActionsFilters {
 	}
 
 	public static function lasntgadmin_course_notifications( $page, $post_ID, $cls, $method ): void {
-		error_log("lasntgadmin_course_notifications: $method, $post_ID, $page");
 		if ( 'custom_canellation_with_message' == $method ) {
 			$subject = get_post_meta( $post_ID, '_cancellation_subject', true );
 			$body    = get_post_meta( $post_ID, '_cancellation_message', true );
