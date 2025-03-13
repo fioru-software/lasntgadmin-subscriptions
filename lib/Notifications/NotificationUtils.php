@@ -123,7 +123,6 @@ class NotificationUtils {
 			$results           = self::check_subscription( $post_ID, $results );
 			$results           = array_merge( $users_with_orders, $results );
 
-			// Deduplicate
 			$unique_results = [];
 			foreach ( $results as $user ) {
 				if ( ! isset( $unique_results[ $user->ID ] ) ) {
@@ -188,8 +187,6 @@ class NotificationUtils {
 	 */
 	public static function get_users_by_product_orders( $product_id, $order_status = [ 'wc-cancelled', 'wc-processing', 'wc-completed' ] ) {
 		global $wpdb;
-
-		// Sanitize status values (optional if fixed)
 		$allowed_statuses = [ 'wc-cancelled', 'wc-processing', 'wc-completed' ];
 		$order_status     = array_intersect( $order_status, $allowed_statuses );
 
@@ -219,7 +216,7 @@ class NotificationUtils {
     ";
 
 		$results = $wpdb->get_results(
-			$wpdb->prepare( $query, array_merge( $order_status, [ $product_id ] ) )
+			$wpdb->prepare( $query, array_merge( $order_status, [ $product_id ] ) )// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		);
 
 		return $results;

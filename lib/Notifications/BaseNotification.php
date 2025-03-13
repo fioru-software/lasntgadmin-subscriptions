@@ -79,13 +79,14 @@ abstract class BaseNotification {
 			if ( $user_count >= NotificationUtils::$per_page ) {
 				$mins = self::$delay_time;
 				switch ( self::$option_name ) {
-					case 'lasntg_subscriptions_options':
-					case 'lasntg_subscriptions_private':
-						$mins += 1;
 					case 'lasntg_subscriptions_regional_options':
 						$mins += 3;
+						break;
 					case 'lasntg_subscriptions_training_officers':
-						$mins += 1;
+						$mins += 2;
+						break;
+					default:
+						++$mins;
 				}
 
 				as_schedule_single_action(
