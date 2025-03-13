@@ -68,6 +68,16 @@ class NotificationUtils {
 
 		return $users;
 	}
+
+	private static function filter_groups_with_quotas( $post_ID, $group_ids ) {
+		return array_filter(
+			$group_ids,
+			function ( $group_id ) use ( $post_ID ) {
+				return self::get_group_quotas( $post_ID, (int) $group_id ) > 0;
+			}
+		);
+	}
+
 	/**
 	 * Get Users in group.
 	 *
@@ -78,67 +88,54 @@ class NotificationUtils {
 	 */
 	public static function get_users_in_group( $post_ID, $role = 'national_manager', $page = 1 ) {
 		global $wpdb;
-		$user_role = "%$role%";
-		$group_ids = self::get_post_group_ids( $post_ID );
-		$params    = array_merge( [ $user_role ], $group_ids );
-		$users     = [];
-		--$page;
-		$page = $page * self::$per_page;
+		$user_role       = "%$role%";
+		$group_ids       = self::get_post_group_ids( $post_ID );
+		$is_special_role = in_array( $role, [ 'training_officer', 'customer' ], true );
 
-		// check quotas for training officer.
-		// remove groups with zero quotas.
-		if (
-			'training_officer' === $role ||
-			'customer' == $role
-		) {
-			foreach ( $group_ids as $key => $group_id ) {
-				$group_id = (int) $group_id;
-				$value    = self::get_group_quotas( $post_ID, $group_id );
-
-				if ( 0 === $value ) {
-					unset( $group_ids[ $key ] );
-				}
-			}
-			// add users with orders. will find those that are excluded by group.
-			$users = self::get_users_by_product_orders_by_role( $post_ID );
+		// Filter groups with non-zero quota.
+		if ( $is_special_role ) {
+			$group_ids = self::filter_groups_with_quotas( $post_ID, $group_ids );
 		}
-		if ( ! $group_ids ) {
+
+		if ( empty( $group_ids ) ) {
 			return [];
 		}
 
-		$string_s = implode( ', ', array_fill( 0, count( $group_ids ), '%s' ) );
-		$query    = "SELECT u.ID, u.display_name, u.user_email 
-FROM wp_users u
-INNER JOIN wp_usermeta um ON um.user_id = u.ID AND um.meta_key = 'wp_capabilities' AND um.meta_value LIKE %s
-INNER JOIN wp_groups_user_group g ON g.user_id = u.ID
-WHERE g.group_id IN ($string_s)
-GROUP BY u.ID
-LIMIT %d OFFSET %d";
+		$params = array_merge( [ $user_role ], $group_ids );
+		$offset = ( $page - 1 ) * self::$per_page;
+
+		$query = "SELECT u.ID, u.display_name, u.user_email 
+			FROM wp_users u
+			INNER JOIN wp_usermeta um ON um.user_id = u.ID AND um.meta_key = 'wp_capabilities' AND um.meta_value LIKE %s
+			INNER JOIN wp_groups_user_group g ON g.user_id = u.ID
+			WHERE g.group_id IN (" . implode( ', ', array_fill( 0, count( $group_ids ), '%s' ) ) . ')
+			GROUP BY u.ID
+			ORDER BY u.ID ASC
+			LIMIT %d OFFSET %d';
 
 		$params[] = self::$per_page;
-		$params[] = $page;
-		$results  = $wpdb->get_results( $wpdb->prepare( $query, $params ) ); //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$params[] = $offset;
 
-		// get unique users rather than duplicates.
-		if (
-			'training_officer' === $role ||
-			'customer' == $role
-		) {
-			// make sure that users with orders do see notifications even if though unsubscribed.
-			$results  = self::check_subscription( $post_ID, $results );
-			$results  = array_merge( $users, $results );
-			$user_ids = [];
-			foreach ( $results as $key => $user ) {
-				if ( in_array( $user->ID, $user_ids ) ) {
-					unset( $results[ $key ] );
-					continue;
+		$results = $wpdb->get_results( $wpdb->prepare( $query, $params ) ); // phpcs:ignore
+
+		if ( $is_special_role ) {
+			$users_with_orders = self::get_users_by_product_orders_by_role( $post_ID );
+			$results           = self::check_subscription( $post_ID, $results );
+			$results           = array_merge( $users_with_orders, $results );
+
+			// Deduplicate
+			$unique_results = [];
+			foreach ( $results as $user ) {
+				if ( ! isset( $unique_results[ $user->ID ] ) ) {
+					$unique_results[ $user->ID ] = $user;
 				}
-				$user_ids[] = $user->ID;
 			}
+			$results = array_values( $unique_results );
 		}
 
 		return $results;
 	}
+
 
 	/**
 	 * Get Users by Product Order and also by role.
@@ -189,28 +186,40 @@ LIMIT %d OFFSET %d";
 	 *
 	 * @return array
 	 */
-	public static function get_users_by_product_orders( $product_id, $order_status = array( 'wc-cancelled', 'wc-processing', 'wc-completed' ) ) {
+	public static function get_users_by_product_orders( $product_id, $order_status = [ 'wc-cancelled', 'wc-processing', 'wc-completed' ] ) {
 		global $wpdb;
-		$args = implode( ',', array_fill( 0, count( $order_status ), '%s' ) );
+
+		// Sanitize status values (optional if fixed)
+		$allowed_statuses = [ 'wc-cancelled', 'wc-processing', 'wc-completed' ];
+		$order_status     = array_intersect( $order_status, $allowed_statuses );
+
+		if ( empty( $order_status ) ) {
+			return [];
+		}
+
+		$placeholders = implode( ', ', array_fill( 0, count( $order_status ), '%s' ) );
+
+		$query = "
+        SELECT DISTINCT users.ID, users.display_name, users.user_email
+        FROM {$wpdb->prefix}woocommerce_order_items AS order_items
+        LEFT JOIN {$wpdb->prefix}woocommerce_order_itemmeta AS order_item_meta 
+            ON order_items.order_item_id = order_item_meta.order_item_id
+        LEFT JOIN {$wpdb->posts} AS posts 
+            ON order_items.order_id = posts.ID
+        LEFT JOIN {$wpdb->postmeta} AS order_p_meta 
+            ON order_p_meta.post_id = posts.ID AND order_p_meta.meta_key = '_customer_user'
+        LEFT JOIN {$wpdb->users} AS users 
+            ON users.ID = order_p_meta.meta_value
+        WHERE posts.post_type = 'shop_order'
+            AND posts.post_status IN ($placeholders)
+            AND order_items.order_item_type = 'line_item'
+            AND order_item_meta.meta_key = '_product_id'
+            AND order_item_meta.meta_value = %s
+        ORDER BY users.display_name ASC
+    ";
 
 		$results = $wpdb->get_results(
-			$wpdb->prepare(
-				"
-			SELECT users.ID, users.display_name, users.user_email
-			FROM {$wpdb->prefix}woocommerce_order_items as order_items
-			LEFT JOIN {$wpdb->prefix}woocommerce_order_itemmeta as order_item_meta ON order_items.order_item_id = order_item_meta.order_item_id
-			LEFT JOIN {$wpdb->posts} AS posts ON order_items.order_id = posts.ID
-			LEFT JOIN {$wpdb->postmeta} as order_p_meta ON order_p_meta.post_id = posts.ID
-            LEFT JOIN {$wpdb->users} as users ON users.ID = order_p_meta.meta_value
-			WHERE posts.post_type = 'shop_order'
-			AND posts.post_status IN ( $args )" // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-					. "AND order_items.order_item_type = 'line_item'
-			AND order_item_meta.meta_key = '_product_id'
-			AND order_item_meta.meta_value = %s
-            GROUP BY users.ID
-			",
-				array_merge( $order_status, [ $product_id ] )
-			)
+			$wpdb->prepare( $query, array_merge( $order_status, [ $product_id ] ) )
 		);
 
 		return $results;

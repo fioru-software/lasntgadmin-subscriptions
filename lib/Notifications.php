@@ -27,7 +27,8 @@ class Notifications {
 			time() + 60,
 			// Run after 1 min.
 			'lasntgadmin_start_course_cancelled_notifications',
-			array( 'post_ID' => $post_ID )
+			array( 'post_ID' => $post_ID ),
+			'lasntgadmin-subscriptions'
 		);
 	}
 
@@ -36,7 +37,8 @@ class Notifications {
 			time() + 60,
 			// Run after 1 min.
 			'lasntgadmin_start_course_updated_notifications',
-			array( 'post_ID' => $post_ID )
+			array( 'post_ID' => $post_ID ),
+			'lasntgadmin-subscriptions'
 		);
 	}
 	public static function course_status_change( $post_ID ): void {

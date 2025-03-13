@@ -49,7 +49,7 @@ abstract class BaseNotification {
 	private static function get_content( $post_ID, $action, $subject, $body, $method, $page = 1 ): void {
 		self::set_option_name();
 		$user_count = NotificationUtils::get_content( $post_ID, $subject, $body, static::$user_role, $page );
-		self::do_notifications_actions($post_ID, $user_count, $action, $page);
+		self::do_notifications_actions( $post_ID, $user_count, $action, $page, $method );
 	}
 	/**
 	 * Course Cancelled.
@@ -71,24 +71,23 @@ abstract class BaseNotification {
 		NotificationUtils::parse_emails_for_users( $user_count, $subject, $body, $post_ID );
 		$action = 'lasntgadmin_course_notifications';
 
-		self::do_notifications_actions($post_ID, $user_count, $action, $page);
+		self::do_notifications_actions( $post_ID, $user_count, $action, $page, 'custom_cancelletaion' );
 	}
 
-	private static function do_notifications_actions($post_ID, $user_count, $action, $page): void
-	{
+	private static function do_notifications_actions( $post_ID, $user_count, $action, $page, $method ): void {
 		if ( is_int( $user_count ) && $user_count >= NotificationUtils::$per_page ) {
 			if ( $user_count >= NotificationUtils::$per_page ) {
 				$mins = self::$delay_time;
-				switch(self::$option_name){
-					case "lasntg_subscriptions_options":
-					case "lasntg_subscriptions_private":
+				switch ( self::$option_name ) {
+					case 'lasntg_subscriptions_options':
+					case 'lasntg_subscriptions_private':
 						$mins += 1;
-					case "lasntg_subscriptions_regional_options":
+					case 'lasntg_subscriptions_regional_options':
 						$mins += 3;
-					case "lasntg_subscriptions_training_officers":
+					case 'lasntg_subscriptions_training_officers':
 						$mins += 1;
 				}
-				
+
 				as_schedule_single_action(
 					time() + 60 * $mins * $page + 1,
 					// Run after 5 mins.
@@ -97,11 +96,12 @@ abstract class BaseNotification {
 						'page'       => $page + 1,
 						'product_id' => $post_ID,
 						'class'      => get_called_class(),
-						'method'     => 'custom_cancelletaion',
-					)
+						'method'     => $method,
+					),
+					'lasntgadmin-subscriptions'
 				);
-			}
-		}
+			}//end if
+		}//end if
 	}
 
 	protected static function process_payment_link( $user, $post_ID, $link ) {
