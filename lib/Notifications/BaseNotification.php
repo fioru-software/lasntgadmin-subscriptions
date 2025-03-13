@@ -86,8 +86,8 @@ abstract class BaseNotification {
 		if ( is_int( $user_count ) && $user_count >= NotificationUtils::$per_page ) {
 			if ( $user_count >= NotificationUtils::$per_page ) {
 				as_schedule_single_action(
-					time() + 60 * 2 * $page + 1,
-					// Run after 2 mins.
+					time() + 60 * 5 * $page + 1,
+					// Run after 5 mins.
 					$action,
 					array(
 						'page'       => $page + 1,

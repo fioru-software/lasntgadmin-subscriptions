@@ -10,7 +10,7 @@ class NotificationUtils {
 
 	public static $location_acf = 'field_63881b84798a5';
 	public static $course_acf   = 'field_6387864196776';
-	public static $per_page     = 10;
+	public static $per_page     = 5;
 	/**
 	 * Should be placed in groups plugin.
 	 */
