@@ -8,6 +8,7 @@ abstract class BaseNotification {
 
 	protected static $option_name;
 	protected static $user_role;
+	private static $delay_time = 5;
 	/**
 	 * Set Option Name.
 	 *
@@ -48,21 +49,7 @@ abstract class BaseNotification {
 	private static function get_content( $post_ID, $action, $subject, $body, $method, $page = 1 ): void {
 		self::set_option_name();
 		$user_count = NotificationUtils::get_content( $post_ID, $subject, $body, static::$user_role, $page );
-		if ( is_int( $user_count ) && $user_count >= NotificationUtils::$per_page ) {
-			if ( $user_count >= NotificationUtils::$per_page ) {
-				as_schedule_single_action(
-					time() + 60 * 2 * $page + 1,
-					// Run after 2 mins.
-					$action,
-					array(
-						'page'       => $page + 1,
-						'product_id' => $post_ID,
-						'class'      => get_called_class(),
-						'method'     => $method,
-					)
-				);
-			}
-		}
+		self::do_notifications_actions($post_ID, $user_count, $action, $page);
 	}
 	/**
 	 * Course Cancelled.
@@ -79,14 +66,31 @@ abstract class BaseNotification {
 	}
 
 	public static function custom_cancelletaion( $post_ID, $subject, $body, $page = 1 ) {
+		self::set_option_name();
 		$user_count = NotificationUtils::get_users_in_group( $post_ID, static::$user_role, $page );
 		NotificationUtils::parse_emails_for_users( $user_count, $subject, $body, $post_ID );
 		$action = 'lasntgadmin_course_notifications';
 
+		self::do_notifications_actions($post_ID, $user_count, $action, $page);
+	}
+
+	private static function do_notifications_actions($post_ID, $user_count, $action, $page): void
+	{
 		if ( is_int( $user_count ) && $user_count >= NotificationUtils::$per_page ) {
 			if ( $user_count >= NotificationUtils::$per_page ) {
+				$mins = self::$delay_time;
+				switch(self::$option_name){
+					case "lasntg_subscriptions_options":
+					case "lasntg_subscriptions_private":
+						$mins += 1;
+					case "lasntg_subscriptions_regional_options":
+						$mins += 3;
+					case "lasntg_subscriptions_training_officers":
+						$mins += 1;
+				}
+				
 				as_schedule_single_action(
-					time() + 60 * 5 * $page + 1,
+					time() + 60 * $mins * $page + 1,
 					// Run after 5 mins.
 					$action,
 					array(
