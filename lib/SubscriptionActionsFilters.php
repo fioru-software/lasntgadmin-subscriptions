@@ -7,7 +7,10 @@ use Lasntg\Admin\Group\GroupUtils;
 use Lasntg\Admin\Orders\OrderUtils;
 use Lasntg\Admin\Products\ProductUtils;
 use Lasntg\Admin\Products\QuotaUtils;
+use Lasntg\Admin\Subscriptions\Notifications\ManagersNotifications;
+use Lasntg\Admin\Subscriptions\Notifications\NotificationUtils;
 use Lasntg\Admin\Subscriptions\Notifications\PrivateNotifications;
+use Lasntg\Admin\Subscriptions\Notifications\RegionalManagerNotifications;
 use Lasntg\Admin\Subscriptions\Notifications\TrainingCenterNotifications;
 use Lasntg\Admin\Subscriptions\SubscriptionPages\SubscriptionManager;
 
@@ -30,8 +33,57 @@ class SubscriptionActionsFilters {
 		add_action( 'woocommerce_order_status_completed', [ self::class, 'new_enrolment_completed' ], 10, 2 );
 
 		add_action( 'phpmailer_init', [ self::class, 'add_logo_to_mail' ] );
+		add_action( 'lasntgadmin_course_notifications', [ self::class, 'lasntgadmin_course_notifications' ], 10, 4 );
+
+		add_action( 'lasntgadmin_start_new_course_notifications', [ self::class, 'lasntgadmin_start_new_course_notifications' ], 10, 1 );
+		add_action( 'lasntgadmin_start_course_updated_notifications', [ self::class, 'lasntgadmin_start_course_updated_notifications' ], 10, 1 );
+		add_action( 'lasntgadmin_start_course_cancelled_notifications', [ self::class, 'lasntgadmin_start_course_cancelled_notifications' ], 10, 1 );
 	}
 
+	public static function lasntgadmin_start_course_cancelled_notifications( $post_ID ): void {
+		$subject = get_post_meta( $post_ID, '_cancellation_subject', true );
+		$body    = get_post_meta( $post_ID, '_cancellation_message', true );
+
+		$email = NotificationUtils::parse_info( $post_ID, $subject, $body );
+
+		if ( $subject && $body ) {
+			ManagersNotifications::custom_cancelletaion( $post_ID, $email['subject'], $email['body'] );
+			RegionalManagerNotifications::custom_cancelletaion( $post_ID, $email['subject'], $email['body'] );
+			TrainingCenterNotifications::custom_cancelletaion( $post_ID, $email['subject'], $email['body'] );
+			PrivateNotifications::custom_cancelletaion( $post_ID, $email['subject'], $email['body'] );
+		} else {
+			ManagersNotifications::course_cancelled( $post_ID );
+			RegionalManagerNotifications::course_cancelled( $post_ID );
+			TrainingCenterNotifications::course_cancelled( $post_ID );
+			PrivateNotifications::course_cancelled( $post_ID );
+		}
+	}
+
+	public static function lasntgadmin_start_course_updated_notifications( $post_ID ): void {
+		ManagersNotifications::course_updated( $post_ID );
+		RegionalManagerNotifications::course_updated( $post_ID );
+		TrainingCenterNotifications::course_updated( $post_ID );
+		PrivateNotifications::course_updated( $post_ID );
+	}
+
+	public static function lasntgadmin_start_new_course_notifications( $post_ID ): void {
+		ManagersNotifications::new_course( $post_ID );
+		TrainingCenterNotifications::new_course( $post_ID );
+		RegionalManagerNotifications::new_course( $post_ID );
+		PrivateNotifications::new_course( $post_ID );
+	}
+
+	public static function lasntgadmin_course_notifications( $page, $post_ID, $cls, $method ): void {
+		if ( 'custom_cancelletaion' == $method ) {
+			$subject = get_post_meta( $post_ID, '_cancellation_subject', true );
+			$body    = get_post_meta( $post_ID, '_cancellation_message', true );
+
+			$email = NotificationUtils::parse_info( $post_ID, $subject, $body );
+			call_user_func( [ $cls, $method ], $post_ID, $email['subject'], $email['body'], $page );
+			return;
+		}
+		call_user_func( [ $cls, $method ], $post_ID, $page );
+	}
 	public static function add_logo_to_mail( &$phpmailer ) {
 
 		$assets_dir = __DIR__ . '/../assets/';

@@ -132,21 +132,38 @@ class ParseEmail {
 	 */
 	private static function replace( $message, array $fields ) {
 		try {
+			$search  = [];
+			$replace = [];
+
 			foreach ( $fields as $name => $value ) {
 				if ( is_array( $value ) ) {
 					$value = implode( ', ', $value );
 				}
+
 				if ( empty( $value ) ) {
 					continue;
 				}
-				$message = str_replace( "{%$name%}", $value, $message );
-				$message = str_replace( "{% $name %}", $value, $message );
-				$message = str_replace( "{%$name %}", $value, $message );
-				$message = str_replace( "{% $name%}", $value, $message );
+
+				$search[]  = "{%$name%}";
+				$replace[] = $value;
+
+				$search[]  = "{% $name %}";
+				$replace[] = $value;
+
+				$search[]  = "{%$name %}";
+				$replace[] = $value;
+
+				$search[]  = "{% $name%}";
+				$replace[] = $value;
+			}//end foreach
+
+			if ( ! empty( $search ) ) {
+				$message = str_replace( $search, $replace, $message );
 			}
 		} catch ( \Exception $e ) {
 			error_log( $e->getMessage() );
-		}
+		}//end try
+
 		return $message;
 	}
 

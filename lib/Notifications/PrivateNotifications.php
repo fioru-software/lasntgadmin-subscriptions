@@ -5,7 +5,7 @@ namespace Lasntg\Admin\Subscriptions\Notifications;
 class PrivateNotifications extends BaseNotification {
 
 	protected static $option_name = 'lasntg_subscriptions_private';
-	protected static $user_role   = 'customer';
+	public static $user_role      = 'customer';
 
 	public static function space_available_waiting_list_pending( $post_ID, $user, $link ) {
 		self::set_option_name();
