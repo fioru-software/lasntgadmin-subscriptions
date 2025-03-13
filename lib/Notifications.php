@@ -61,7 +61,8 @@ class Notifications {
 			time() + 60,
 			// Run after 1 min.
 			'lasntgadmin_start_new_course_notifications',
-			array( 'post_ID' => $post_ID )
+			array( 'post_ID' => $post_ID ),
+			'lasntgadmin-subscriptions'
 		);
 	}
 
