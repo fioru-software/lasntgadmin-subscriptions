@@ -30,7 +30,7 @@ class NotificationUtils {
 		if ( isset( $_POST[ '_quotas_field_' . $group_id ] ) ) { //phpcs:ignore WordPress.Security.NonceVerification.Missing
 			$value = sanitize_text_field( wp_unslash( $_POST[ '_quotas_field_' . $group_id ] ) ); //phpcs:ignore WordPress.Security.NonceVerification.Missing
 		}
-		if(empty($value)){
+		if ( empty( $value ) ) {
 			return 1;
 		}
 		if ( is_numeric( $value ) ) {
