@@ -39,9 +39,32 @@ class SubscriptionManager {
 
 	public static function confirm_meta( $user_id, $value, $type = 'category' ) {
 		global $wpdb;
-		return $wpdb->get_col(
-			$wpdb->prepare( "SELECT umeta_id FROM $wpdb->usermeta WHERE user_id = %s and meta_value = %s and meta_key = %s", [ $user_id, $value, self::$name . $type ] )
-		);
+		$meta_key = self::$name . $type;
+		// if the $value is array.
+		if ( is_array( $value ) && ! empty( $value ) ) {
+			$placeholders = implode( ',', array_fill( 0, count( $value ), '%s' ) );
+			$sql = "
+				SELECT umeta_id
+				FROM $wpdb->usermeta
+				WHERE user_id = %d
+				AND meta_key = %s
+				AND meta_value IN ($placeholders)
+			";
+
+			$params = array_merge( [ $user_id, $meta_key ], $value );
+
+			return $wpdb->get_col( $wpdb->prepare( $sql, ...$params ) );
+		} else {
+			// fallback to single value
+			return $wpdb->get_col(
+				$wpdb->prepare(
+					"SELECT umeta_id FROM $wpdb->usermeta WHERE user_id = %d AND meta_key = %s AND meta_value = %s",
+					$user_id,
+					$meta_key,
+					$value
+				)
+			);
+		}
 	}
 
 	public static function show_form(): void {

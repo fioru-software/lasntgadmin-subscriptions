@@ -40,7 +40,7 @@ class NotificationUtils {
 	}
 
 	public static function check_subscription( int $post_ID, array $users ): array {
-		if ( ! $users || ! isset( $_POST['acf'] ) ) { //phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( ! $users ) { //phpcs:ignore WordPress.Security.NonceVerification.Missing
 			return [];
 		}
 		/**
@@ -50,15 +50,12 @@ class NotificationUtils {
 		 */
 		$product = new \WC_Product( $post_ID );
 		$cat_ids = $product->get_category_ids();
-
-		$acf         = $_POST['acf']; //phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$course_type = sanitize_text_field( wp_unslash( $acf[ self::$course_acf ] ) );
-
-		$cat_id = $cat_ids[0];
+		$course_type = get_field( self::$course_acf, $post_ID, true);
+		
 		foreach ( $users as $key => $user ) {
 			// check if user has any checked options.
 			// Category.
-			$in_mailing_category = SubscriptionManager::confirm_meta( $user->ID, $cat_id );
+			$in_mailing_category = SubscriptionManager::confirm_meta( $user->ID, $cat_ids );
 
 			// Event Type.
 			$in_course = SubscriptionManager::confirm_meta( $user->ID, $course_type, 'course_type' );
@@ -99,7 +96,7 @@ class NotificationUtils {
 		if ( $is_special_role ) {
 			$group_ids = self::filter_groups_with_quotas( $post_ID, $group_ids );
 		}
-
+		
 		if ( empty( $group_ids ) ) {
 			return [];
 		}
