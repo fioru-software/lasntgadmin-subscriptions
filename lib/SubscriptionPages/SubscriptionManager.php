@@ -42,20 +42,19 @@ class SubscriptionManager {
 		$meta_key = self::$name . $type;
 		// if the $value is array.
 		if ( is_array( $value ) && ! empty( $value ) ) {
-			$placeholders = implode( ',', array_fill( 0, count( $value ), '%s' ) );
-			$sql = "
-				SELECT umeta_id
+			$sql = "SELECT umeta_id
 				FROM $wpdb->usermeta
 				WHERE user_id = %d
 				AND meta_key = %s
-				AND meta_value IN ($placeholders)
-			";
+				AND meta_value IN (" . implode( ',', array_fill( 0, count( $value ), '%s' ) ) . ')';
 
 			$params = array_merge( [ $user_id, $meta_key ], $value );
 
-			return $wpdb->get_col( $wpdb->prepare( $sql, ...$params ) );
+			return $wpdb->get_col(
+				$wpdb->prepare( $sql, ...$params ) // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			);
 		} else {
-			// fallback to single value
+			// fallback to single value.
 			return $wpdb->get_col(
 				$wpdb->prepare(
 					"SELECT umeta_id FROM $wpdb->usermeta WHERE user_id = %d AND meta_key = %s AND meta_value = %s",
@@ -64,7 +63,7 @@ class SubscriptionManager {
 					$value
 				)
 			);
-		}
+		}//end if
 	}
 
 	public static function show_form(): void {

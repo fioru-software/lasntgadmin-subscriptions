@@ -48,10 +48,10 @@ class NotificationUtils {
 		 * Check location.
 		 * Check course type.
 		 */
-		$product = new \WC_Product( $post_ID );
-		$cat_ids = $product->get_category_ids();
-		$course_type = get_field( self::$course_acf, $post_ID, true);
-		
+		$product     = new \WC_Product( $post_ID );
+		$cat_ids     = $product->get_category_ids();
+		$course_type = get_field( self::$course_acf, $post_ID, true );
+
 		foreach ( $users as $key => $user ) {
 			// check if user has any checked options.
 			// Category.
@@ -88,7 +88,10 @@ class NotificationUtils {
 	 */
 	public static function get_users_in_group( $post_ID, $role = 'national_manager', $page = 1 ) {
 		global $wpdb;
-		$user_role       = "%$role%";
+		/**
+		 * $wpdb->prepare() does not automatically quote strings inside LIKE patterns properly if you supply wildcards manually.
+		 */
+		$user_role       = '%' . $wpdb->esc_like( $role ) . '%';
 		$group_ids       = self::get_post_group_ids( $post_ID );
 		$is_special_role = in_array( $role, [ 'training_officer', 'customer' ], true );
 
@@ -96,24 +99,24 @@ class NotificationUtils {
 		if ( $is_special_role ) {
 			$group_ids = self::filter_groups_with_quotas( $post_ID, $group_ids );
 		}
-		
+
 		if ( empty( $group_ids ) ) {
 			return [];
 		}
-
-		$params = array_merge( [ $user_role ], $group_ids );
-		$offset = ( $page - 1 ) * self::$per_page;
-
-		$query = "SELECT u.ID, u.display_name, u.user_email 
+		$placeholders = implode( ', ', array_fill( 0, count( $group_ids ), '%s' ) );
+		$query        = "SELECT DISTINCT u.ID, u.display_name, u.user_email 
 			FROM wp_users u
 			INNER JOIN wp_usermeta um ON um.user_id = u.ID AND um.meta_key = 'wp_capabilities' AND um.meta_value LIKE %s
 			INNER JOIN wp_groups_user_group g ON g.user_id = u.ID
-			WHERE g.group_id IN (" . implode( ', ', array_fill( 0, count( $group_ids ), '%s' ) ) . ')
-			GROUP BY u.ID
+			WHERE g.group_id IN ($placeholders)
 			ORDER BY u.ID ASC
-			LIMIT %d OFFSET %d';
+			LIMIT %d OFFSET %d";
 
-		$params[] = self::$per_page;
+		// Merge params.
+		$params   = array_merge( [ $user_role ], $group_ids );
+		$per_page = (int) self::$per_page;
+		$offset   = ( (int) $page - 1 ) * $per_page;
+		$params[] = $per_page;
 		$params[] = $offset;
 
 		$results = $wpdb->get_results( $wpdb->prepare( $query, $params ) ); // phpcs:ignore
@@ -125,9 +128,7 @@ class NotificationUtils {
 
 			$unique_results = [];
 			foreach ( $results as $user ) {
-				if ( ! isset( $unique_results[ $user->ID ] ) ) {
-					$unique_results[ $user->ID ] = $user;
-				}
+				$unique_results[ $user->ID ] = $user;
 			}
 			$results = array_values( $unique_results );
 		}
