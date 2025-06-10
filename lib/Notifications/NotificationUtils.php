@@ -17,12 +17,12 @@ class NotificationUtils {
 	 * Should be placed in groups plugin.
 	 */
 	public static function get_post_group_ids( $post_ID ) {
-		// this is of the assumption it's the current group.
+		// This is of the assumption it's the current group.
 		if ( ! isset( $_POST['groups-read'] ) ) { //phpcs:ignore WordPress.Security.NonceVerification.Missing
-			// gets all local authority level groups
+			// Gets all local authority level groups.
 			$groups = GroupUtils::get_child_groups_by_post_id( $post_ID );
-			if( empty( $groups ) ) {
-				// means course is assigned to all groups ie. get all groups
+			if ( empty( $groups ) ) {
+				// Means course is assigned to all groups ie. get all groups.
 				$groups = GroupUtils::get_all_local_authority_groups();
 			}
 			$group_ids = array_column( $groups, 'group_id' );
@@ -101,9 +101,9 @@ class NotificationUtils {
 		/**
 		 * $wpdb->prepare() does not automatically quote strings inside LIKE patterns properly if you supply wildcards manually.
 		 */
-		$user_role       = '%' . $wpdb->esc_like( $role ) . '%';
-		$group_ids       = self::get_post_group_ids( $post_ID );
-		
+		$user_role = '%' . $wpdb->esc_like( $role ) . '%';
+		$group_ids = self::get_post_group_ids( $post_ID );
+
 		$is_special_role = in_array( $role, [ 'training_officer', 'customer' ], true );
 
 		// Filter groups with non-zero quota.
