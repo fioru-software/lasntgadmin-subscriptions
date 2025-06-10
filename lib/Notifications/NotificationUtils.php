@@ -25,8 +25,8 @@ class NotificationUtils {
 				// means course is assigned to all groups ie. get all groups
 				$groups = GroupUtils::get_all_local_authority_groups();
 				$group_ids = array_column( $groups, 'group_id' );
-				return $group_ids;
 			}
+			return $group_ids;
 		}
 		return (array) array_map( 'sanitize_text_field', wp_unslash( $_POST['groups-read'] ) ); //phpcs:ignore WordPress.Security.NonceVerification.Missing
 	}
