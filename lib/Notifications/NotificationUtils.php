@@ -5,19 +5,28 @@ namespace Lasntg\Admin\Subscriptions\Notifications;
 use Lasntg\Admin\Group\GroupUtils;
 use Lasntg\Admin\Subscriptions\OptionPages\Editors;
 use Lasntg\Admin\Subscriptions\SubscriptionPages\SubscriptionManager;
+use WC_Product;
 
 class NotificationUtils {
 
 	public static $location_acf = 'field_63881b84798a5';
 	public static $course_acf   = 'field_6387864196776';
 	public static $per_page     = 5;
+
 	/**
 	 * Should be placed in groups plugin.
 	 */
 	public static function get_post_group_ids( $post_ID ) {
 		// this is of the assumption it's the current group.
 		if ( ! isset( $_POST['groups-read'] ) ) { //phpcs:ignore WordPress.Security.NonceVerification.Missing
-			return GroupUtils::get_read_group_ids( $post_ID );
+			// gets all local authority level groups
+			$group_ids = GroupUtils::get_child_groups_by_post_id( $post_ID );
+			if( empty( $group_ids ) ) {
+				// means course is assigned to all groups ie. get all groups
+				$groups = GroupUtils::get_all_local_authority_groups();
+				$group_ids = array_column( $groups, 'group_id' );
+				return $group_ids;
+			}
 		}
 		return (array) array_map( 'sanitize_text_field', wp_unslash( $_POST['groups-read'] ) ); //phpcs:ignore WordPress.Security.NonceVerification.Missing
 	}
@@ -40,6 +49,7 @@ class NotificationUtils {
 	}
 
 	public static function check_subscription( int $post_ID, array $users ): array {
+
 		if ( ! $users ) { //phpcs:ignore WordPress.Security.NonceVerification.Missing
 			return [];
 		}
@@ -48,19 +58,19 @@ class NotificationUtils {
 		 * Check location.
 		 * Check course type.
 		 */
-		$product     = new \WC_Product( $post_ID );
+		$product     = new WC_Product( $post_ID );
 		$cat_ids     = $product->get_category_ids();
 		$course_type = get_field( self::$course_acf, $post_ID, true );
 
 		foreach ( $users as $key => $user ) {
 			// check if user has any checked options.
 			// Category.
-			$in_mailing_category = SubscriptionManager::confirm_meta( $user->ID, $cat_ids );
+			$in_mailing_category = SubscriptionManager::get_meta_id( $user->ID, $cat_ids );
 
 			// Event Type.
-			$in_course = SubscriptionManager::confirm_meta( $user->ID, $course_type, 'course_type' );
+			$in_course = SubscriptionManager::get_meta_id( $user->ID, $course_type, 'course_type' );
 
-			if ( ! $in_mailing_category || ! $in_course ) {
+			if ( ! $in_mailing_category && ! $in_course ) {
 				// unset user from $users since they do not have any of the required options.
 				unset( $users[ $key ] );
 			}
@@ -93,6 +103,7 @@ class NotificationUtils {
 		 */
 		$user_role       = '%' . $wpdb->esc_like( $role ) . '%';
 		$group_ids       = self::get_post_group_ids( $post_ID );
+		
 		$is_special_role = in_array( $role, [ 'training_officer', 'customer' ], true );
 
 		// Filter groups with non-zero quota.
@@ -288,6 +299,7 @@ class NotificationUtils {
 	 * @return bool True|False.
 	 */
 	public static function get_content( $post_ID, $subject, $body, $user_role = 'national_manager', $page = 1 ) {
+
 		$email = self::get_email_subject_and_body( $post_ID, $subject, $body );
 
 		if ( ! $email ) {

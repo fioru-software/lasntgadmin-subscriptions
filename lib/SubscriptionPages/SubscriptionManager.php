@@ -37,7 +37,7 @@ class SubscriptionManager {
 		return get_user_meta( $user_id, self::$name . $type );
 	}
 
-	public static function confirm_meta( $user_id, $value, $type = 'category' ) {
+	public static function get_meta_id( int $user_id, $value, string $type = 'category' ): int {
 		global $wpdb;
 		$meta_key = self::$name . $type;
 		// if the $value is array.
@@ -50,12 +50,12 @@ class SubscriptionManager {
 
 			$params = array_merge( [ $user_id, $meta_key ], $value );
 
-			return $wpdb->get_col(
+			$result = $wpdb->get_var(
 				$wpdb->prepare( $sql, ...$params ) // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 			);
 		} else {
 			// fallback to single value.
-			return $wpdb->get_col(
+			$result = $wpdb->get_var(
 				$wpdb->prepare(
 					"SELECT umeta_id FROM $wpdb->usermeta WHERE user_id = %d AND meta_key = %s AND meta_value = %s",
 					$user_id,
@@ -64,6 +64,7 @@ class SubscriptionManager {
 				)
 			);
 		}//end if
+		return intval( $result );
 	}
 
 	public static function show_form(): void {
