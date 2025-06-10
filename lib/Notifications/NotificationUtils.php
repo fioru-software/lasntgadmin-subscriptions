@@ -20,12 +20,12 @@ class NotificationUtils {
 		// this is of the assumption it's the current group.
 		if ( ! isset( $_POST['groups-read'] ) ) { //phpcs:ignore WordPress.Security.NonceVerification.Missing
 			// gets all local authority level groups
-			$group_ids = GroupUtils::get_child_groups_by_post_id( $post_ID );
-			if( empty( $group_ids ) ) {
+			$groups = GroupUtils::get_child_groups_by_post_id( $post_ID );
+			if( empty( $groups ) ) {
 				// means course is assigned to all groups ie. get all groups
 				$groups = GroupUtils::get_all_local_authority_groups();
-				$group_ids = array_column( $groups, 'group_id' );
 			}
+			$group_ids = array_column( $groups, 'group_id' );
 			return $group_ids;
 		}
 		return (array) array_map( 'sanitize_text_field', wp_unslash( $_POST['groups-read'] ) ); //phpcs:ignore WordPress.Security.NonceVerification.Missing
