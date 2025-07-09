@@ -393,6 +393,16 @@ class SubscriptionActionsFilters {
 		if ( ProductUtils::$publish_status !== $post_after->post_status ) {
 			return $post_ID;
 		}
+
+		// The queue_course_updated_email() code was here.
+		return $post_ID;
+	}
+
+	/**
+	 * Moved out of post_updated method to disable due to
+	 * users receiving duplicate emails.
+	 */
+	public static function queue_course_updated_email() {
 		$new_location = isset( $_POST['acf'] ) && isset( $_POST['acf']['field_63881b84798a5'] ) ? sanitize_text_field( wp_unslash( $_POST['acf']['field_63881b84798a5'] ) ) : false; //phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$old_location = get_field( 'field_63881b84798a5', $post_ID );
 
@@ -405,7 +415,6 @@ class SubscriptionActionsFilters {
 		if ( $new_location !== $old_location || $date1 != $date2 ) {
 			Notifications::course_updated( $post_ID );
 		}
-		return $post_ID;
 	}
 
 	public static function wp_insert_post( $post_id, $post ) {
