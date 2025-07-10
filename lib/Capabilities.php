@@ -11,21 +11,31 @@ class Capabilities {
 	 * Admin capabilities
 	 */
 	public static function get_administrator_capabilities(): array {
-		return array();
+		return [
+			'read',
+			'view_admin_dashboard',
+		];
 	}
 
 	/**
 	 * National manager capabilities
 	 */
 	public static function get_national_manager_capabilities(): array {
-		return array();
+		return [
+			'read',
+			'view_admin_dashboard',
+		];
 	}
 
 	/**
 	 * Regional training officer capabilities
 	 */
 	public static function get_regional_training_centre_manager_capabilities(): array {
-		return [ 'lasntg_list_options' ];
+		return [
+			'read',
+			'view_admin_dashboard',
+			'lasntg_list_options',
+		];
 	}
 
 	/**
@@ -33,6 +43,8 @@ class Capabilities {
 	 */
 	public static function get_training_officer_capabilities(): array {
 		return [
+			'read',
+			'view_admin_dashboard',
 			'lasntg_list_options',
 		];
 	}
@@ -41,7 +53,11 @@ class Capabilities {
 	 * Fire training officer capabilities
 	 */
 	public static function get_fire_training_officer_capabilities(): array {
-		return [];
+		return [
+			'read',
+			'view_admin_dashboard',
+			'lasntg_list_options',
+		];
 	}
 
 	public static function add(): void {
